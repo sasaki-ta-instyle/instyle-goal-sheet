@@ -94,6 +94,8 @@ export interface BonusData {
   mgmtEval: number;
 }
 
+export type GradeExpectations = Partial<Record<Grade, string>>;
+
 export interface FormData {
   cover: CoverData;
   company: CompanyGoalData;
@@ -101,6 +103,7 @@ export interface FormData {
   personal: PersonalGoalData;
   promotion: PromotionData;
   bonus: BonusData;
+  gradeExpectations: GradeExpectations;
 }
 
 export interface GradeEntry {
@@ -204,5 +207,6 @@ export function createDefaultFormData(): FormData {
       difficulty: 0,
       mgmtEval: 0,
     },
+    gradeExpectations: {},
   };
 }

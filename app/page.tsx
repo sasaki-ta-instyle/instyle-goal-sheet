@@ -27,6 +27,7 @@ export default function Home() {
   const updatePersonal = (d: FormData['personal']) => setFormData(prev => ({ ...prev, personal: d }));
   const updatePromotion = (d: FormData['promotion']) => setFormData(prev => ({ ...prev, promotion: d }));
   const updateBonus = (d: FormData['bonus']) => setFormData(prev => ({ ...prev, bonus: d }));
+  const updateGradeExpectations = (d: FormData['gradeExpectations']) => setFormData(prev => ({ ...prev, gradeExpectations: d }));
 
   const handleDownload = async () => {
     setIsGenerating(true);
@@ -89,7 +90,7 @@ export default function Home() {
             {step === 2 && <CompanyGoalForm data={formData.company} onChange={updateCompany} />}
             {step === 3 && <DeptGoalForm data={formData.dept} onChange={updateDept} />}
             {step === 4 && <PersonalGoalForm data={formData.personal} onChange={updatePersonal} />}
-            {step === 5 && <GradeForm selectedGrade={formData.cover.grade} />}
+            {step === 5 && <GradeForm selectedGrade={formData.cover.grade} expectations={formData.gradeExpectations} onChange={updateGradeExpectations} />}
             {step === 6 && <PromotionForm data={formData.promotion} onChange={updatePromotion} />}
             {step === 7 && <BonusForm data={formData.bonus} onChange={updateBonus} />}
             {step === 8 && <ConfirmView data={formData} />}

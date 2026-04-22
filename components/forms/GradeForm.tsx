@@ -1,16 +1,21 @@
 'use client';
-import { GRADE_TABLE, Grade } from '@/lib/types';
+import { GRADE_TABLE, Grade, GradeExpectations } from '@/lib/types';
 
 interface Props {
   selectedGrade: Grade | '';
+  expectations: GradeExpectations;
+  onChange: (expectations: GradeExpectations) => void;
 }
 
-export default function GradeForm({ selectedGrade }: Props) {
+export default function GradeForm({ selectedGrade, expectations, onChange }: Props) {
+  const update = (key: Grade, value: string) =>
+    onChange({ ...expectations, [key]: value });
+
   return (
     <div>
       <p className="section-title">スライド 5 — 04｜Grade表</p>
       <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: 24 }}>
-        カバーで入力したGradeをハイライト表示します。変更する場合はStep 1に戻ってください。
+        各Gradeに求める目安を入力してください。カバーで選択したGradeをハイライト表示します。
       </p>
 
       {selectedGrade && (
@@ -37,6 +42,7 @@ export default function GradeForm({ selectedGrade }: Props) {
               <th>名称</th>
               <th>Grade</th>
               <th>基本給与（円）</th>
+              <th>各人が各クラスに求める目安</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +80,7 @@ export default function GradeForm({ selectedGrade }: Props) {
                         {tier.tierName}
                       </td>
                     )}
-                    <td style={{ fontWeight: isSelected ? 700 : 500 }}>
+                    <td style={{ fontWeight: isSelected ? 700 : 500, whiteSpace: 'nowrap' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                         {isSelected && (
                           <span style={{
@@ -91,8 +97,17 @@ export default function GradeForm({ selectedGrade }: Props) {
                         {entry.key}
                       </span>
                     </td>
-                    <td style={{ fontWeight: isSelected ? 700 : 400 }}>
+                    <td style={{ fontWeight: isSelected ? 700 : 400, whiteSpace: 'nowrap' }}>
                       {entry.salary}
+                    </td>
+                    <td>
+                      <textarea
+                        className="input"
+                        style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 52, resize: 'vertical' }}
+                        value={expectations[entry.key] ?? ''}
+                        onChange={e => update(entry.key, e.target.value)}
+                        placeholder={`${entry.key} Gradeに求める目安・行動基準`}
+                      />
                     </td>
                   </tr>
                 );

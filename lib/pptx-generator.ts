@@ -249,24 +249,25 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
 }
 
 // スライド5: Grade表
-function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string) {
+function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expectations: Record<string, string>) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
   addSlideHeader(sl, '04｜Grade表', 'INSTYLE GROUP｜人事制度　5 / 7');
 
-  const x0 = 1.5;
+  const x0 = 0.4;
   let y = 1.1;
   const rowH = 0.38;
-  const colWidths = [1.0, 3.5, 1.5, 2.0];
+  const colWidths = [0.8, 2.8, 1.2, 1.8, 6.45];
 
   sl.addText('現在値に○をつけてください', {
-    x: x0, y: y - 0.3, w: 8, h: 0.25,
+    x: x0, y: y - 0.3, w: 10, h: 0.25,
     fontFace: FONT, fontSize: 8, color: C.muted,
   });
 
+  const headers = ['ティア', '名称', 'Grade', '基本給与（円）', '各人が各クラスに求める目安'];
   const tableData: pptxgen.TableRow[] = [
-    ['ティア', '名称', 'Grade', '基本給与（円）'].map((h, i) => ({
+    headers.map((h, i) => ({
       text: h,
       options: {
         bold: true, fontSize: 7, fontFace: FONT,
@@ -320,19 +321,28 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string) {
             align: 'right' as const,
           },
         },
+        {
+          text: expectations[entry.key] || '',
+          options: {
+            fontSize: 8, fontFace: FONT, color: C.text,
+            fill: { color: fillColor },
+            align: 'left' as const,
+          },
+        },
       ]);
     });
   });
 
+  const totalW = colWidths.reduce((a, b) => a + b, 0);
   sl.addTable(tableData, {
-    x: x0, y, w: colWidths.reduce((a, b) => a + b, 0),
+    x: x0, y, w: totalW,
     rowH,
     border: { pt: 0, color: 'FFFFFF' },
     autoPage: false,
   });
 
   sl.addText('※ 2026年4月時点', {
-    x: x0, y: y + tableData.length * rowH + 0.1, w: 8, h: 0.2,
+    x: x0, y: y + tableData.length * rowH + 0.1, w: 10, h: 0.2,
     fontFace: FONT, fontSize: 7, color: C.muted,
   });
 }
@@ -486,7 +496,7 @@ export async function generatePptx(data: FormData) {
   slide2(prs, data);
   slide3(prs, data);
   slide4(prs, data);
-  slide5(prs, data.cover.grade);
+  slide5(prs, data.cover.grade, data.gradeExpectations as Record<string, string>);
   slide6(prs, data);
   slide7(prs, data);
 
