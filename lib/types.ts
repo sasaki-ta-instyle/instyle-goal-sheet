@@ -124,8 +124,8 @@ export const GRADE_TABLE: GradeTier[] = [
     { key: 'i', salary: '—' },
   ]},
   { tier: 'N', tierName: 'NO RULES and NEVER SAY NEVER', grades: [
-    { key: 'N', salary: '—' },
-    { key: 'n', salary: '—' },
+    { key: 'N', salary: '1,110,000' },
+    { key: 'n', salary: '1,000,000' },
   ]},
   { tier: 'S', tierName: 'STRATEGIC', grades: [
     { key: 'S', salary: '900,000' },
