@@ -156,7 +156,7 @@ export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flat
     .filter(g => !HIDDEN_GRADES.includes(g.key))
     .map(g => ({
       value: g.key,
-      label: `${g.key}  (${g.salary}円)`,
+      label: g.salary === '—' ? g.key : `${g.key}  (${g.salary}円/月)`,
     }))
 );
 
