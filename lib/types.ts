@@ -149,7 +149,7 @@ export const GRADE_TABLE: GradeTier[] = [
   ]},
 ];
 
-const HIDDEN_GRADES: Grade[] = ['I', 'i', 'N', 'n'];
+const HIDDEN_GRADES: Grade[] = ['N', 'n'];
 
 export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flatMap(tier =>
   tier.grades
