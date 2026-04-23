@@ -149,11 +149,15 @@ export const GRADE_TABLE: GradeTier[] = [
   ]},
 ];
 
+const HIDDEN_GRADES: Grade[] = ['I', 'i', 'N', 'n'];
+
 export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flatMap(tier =>
-  tier.grades.map(g => ({
-    value: g.key,
-    label: g.salary === '—' ? g.key : `${g.key}  (${g.salary}円)`,
-  }))
+  tier.grades
+    .filter(g => !HIDDEN_GRADES.includes(g.key))
+    .map(g => ({
+      value: g.key,
+      label: `${g.key}  (${g.salary}円)`,
+    }))
 );
 
 const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', growth: '', nextTarget: '', actual: '' });

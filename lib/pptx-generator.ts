@@ -258,7 +258,8 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
   const x0 = 0.4;
   const y = 1.1;
   const rowH = 0.38;
-  const colWidths = [0.8, 2.8, 1.2, 1.8, 6.45];
+  // 合計 = W - x0*2 = 13.33 - 0.8 = 12.53
+  const colWidths = [0.7, 2.4, 1.0, 1.83, 6.6];
 
   sl.addText('現在値に○をつけてください', {
     x: x0, y: y - 0.3, w: 10, h: 0.25,
@@ -267,14 +268,13 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
 
   const headers = ['ティア', '名称', 'Grade', '基本給与（円）', '各人が各クラスに求める目安'];
   const tableData: pptxgen.TableRow[] = [
-    headers.map((h, i) => ({
+    headers.map(h => ({
       text: h,
       options: {
         bold: true, fontSize: 7, fontFace: FONT,
         color: C.muted,
         fill: { color: C.header },
         align: 'left' as const,
-        colW: colWidths[i],
       },
     })),
   ];
@@ -284,17 +284,23 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
       const isSelected = entry.key === selectedGrade;
       const fillColor = isSelected ? 'D8D4CA' : gIdx % 2 === 0 ? C.surface : C.surface2;
 
-      tableData.push([
-        {
-          text: gIdx === 0 ? tier.tier : '',
+      const row: pptxgen.TableRow = [];
+
+      // rowspan セルは最初の行のみ追加。2行目以降は省略（pptxgenjs の rowspan 仕様）
+      if (gIdx === 0) {
+        row.push({
+          text: tier.tier,
           options: {
             bold: true, fontSize: 13, fontFace: FONT,
             color: C.text,
             fill: { color: 'E0DDD4' },
             align: 'center' as const,
-            rowspan: gIdx === 0 ? tier.grades.length : undefined,
+            rowspan: tier.grades.length,
           },
-        },
+        });
+      }
+
+      row.push(
         {
           text: gIdx === 0 ? tier.tierName : '',
           options: {
@@ -329,13 +335,16 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             align: 'left' as const,
           },
         },
-      ]);
+      );
+
+      tableData.push(row);
     });
   });
 
-  const totalW = colWidths.reduce((a, b) => a + b, 0);
   sl.addTable(tableData, {
-    x: x0, y, w: totalW,
+    x: x0, y,
+    w: W - x0 * 2,
+    colW: colWidths,
     rowH,
     border: { pt: 0, color: 'FFFFFF' },
     autoPage: false,
