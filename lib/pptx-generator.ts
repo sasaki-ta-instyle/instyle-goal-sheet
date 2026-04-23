@@ -266,7 +266,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
     fontFace: FONT, fontSize: 8, color: C.muted,
   });
 
-  const headers = ['ティア', '名称', 'Grade', '基本給与（円）', '各人が各クラスに求める目安'];
+  const headers = ['ティア', '名称', 'Grade', '基本給与（円/月）', '各人が各クラスに求める目安'];
   const tableData: pptxgen.TableRow[] = [
     headers.map(h => ({
       text: h,

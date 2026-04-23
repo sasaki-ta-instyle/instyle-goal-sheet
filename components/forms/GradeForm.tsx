@@ -41,7 +41,7 @@ export default function GradeForm({ selectedGrade, expectations, onChange }: Pro
               <th>ティア</th>
               <th>名称</th>
               <th>Grade</th>
-              <th>基本給与（円）</th>
+              <th>基本給与（円/月）</th>
               <th>各人が各クラスに求める目安</th>
             </tr>
           </thead>
