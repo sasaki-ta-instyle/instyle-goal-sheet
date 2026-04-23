@@ -6,13 +6,18 @@ interface Props {
   onChange: (data: DeptGoalData) => void;
 }
 
-function TI({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+const toNumeric = (v: string) =>
+  v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+   .replace(/[^0-9.\-,]/g, '');
+
+function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
   return (
     <input
       className="input"
       style={{ padding: '6px 8px', fontSize: '.8125rem' }}
       value={value}
-      onChange={e => onChange(e.target.value)}
+      inputMode={numeric ? 'decimal' : undefined}
+      onChange={e => onChange(numeric ? toNumeric(e.target.value) : e.target.value)}
       placeholder={placeholder ?? '—'}
     />
   );
@@ -104,6 +109,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                       value={data[item.key][c.key]}
                       onChange={v => updateKpi(item.key, c.key, v)}
                       placeholder="0"
+                      numeric
                     />
                   </td>
                 ))}

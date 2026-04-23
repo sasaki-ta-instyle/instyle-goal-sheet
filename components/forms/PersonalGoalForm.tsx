@@ -6,13 +6,18 @@ interface Props {
   onChange: (data: PersonalGoalData) => void;
 }
 
-function TI({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+const toNumeric = (v: string) =>
+  v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+   .replace(/[^0-9.\-,]/g, '');
+
+function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
   return (
     <input
       className="input"
       style={{ padding: '6px 8px', fontSize: '.8125rem' }}
       value={value}
-      onChange={e => onChange(e.target.value)}
+      inputMode={numeric ? 'decimal' : undefined}
+      onChange={e => onChange(numeric ? toNumeric(e.target.value) : e.target.value)}
       placeholder={placeholder ?? '—'}
     />
   );
@@ -84,7 +89,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
               <tr key={i}>
                 <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>目標{i + 1}</td>
                 <td><TI value={row.goal} onChange={v => updateSmart(i, 'goal', v)} placeholder="具体的な目標" /></td>
-                <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" /></td>
+                <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" numeric /></td>
                 <td><TI value={row.deadline} onChange={v => updateSmart(i, 'deadline', v)} placeholder="〇月末" /></td>
                 <td><TI value={row.note} onChange={v => updateSmart(i, 'note', v)} placeholder="関連目標など" /></td>
               </tr>
