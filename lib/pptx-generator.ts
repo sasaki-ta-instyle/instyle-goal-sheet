@@ -14,6 +14,13 @@ const C = {
 };
 
 const FONT = '游ゴシック';
+
+function calcGrowth(prev: string, actual: string): string {
+  const p = parseFloat((prev || '').replace(/,/g, ''));
+  const a = parseFloat((actual || '').replace(/,/g, ''));
+  if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
+  return `${Math.round((a / p - 1) * 100)}%`;
+}
 const W = 13.33;
 const H = 7.5;
 
@@ -145,24 +152,24 @@ function slide2(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const c = d.company;
   let y = 1.05;
 
-  const NUM_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '成長率(%)', '来期目標', '今期実績\n2026.4〜9'];
+  const NUM_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '今期実績\n2026.4〜9', '成長率(%)', '来期目標'];
 
   // ① 売上
   addSectionLabel(sl, y, '① 売上');
   y += 0.3;
   addTable(sl, y, ['指標', ...NUM_COLS], [
-    ['グループ売上合計', c.revenue.prev || '—', c.revenue.target || '—', c.revenue.growth || '—', c.revenue.nextTarget || '—', c.revenue.actual || '—'],
-  ], [2.2, 1.5, 1.5, 1.0, 1.2, 1.5]);
+    ['グループ売上合計', c.revenue.prev || '—', c.revenue.target || '—', c.revenue.actual || '—', calcGrowth(c.revenue.prev, c.revenue.actual), c.revenue.nextTarget || '—'],
+  ], [2.2, 1.5, 1.5, 1.5, 1.0, 2.0]);
   y += 0.3 + 0.28;
 
   // ② 利益
   addSectionLabel(sl, y, '② 利益');
   y += 0.3;
   addTable(sl, y, ['指標', ...NUM_COLS], [
-    ['グループ営業利益', c.operatingProfit.prev || '—', c.operatingProfit.target || '—', c.operatingProfit.growth || '—', c.operatingProfit.nextTarget || '—', c.operatingProfit.actual || '—'],
-    ['グループ営業利益率', c.operatingMargin.prev || '—', c.operatingMargin.target || '—', c.operatingMargin.growth || '—', c.operatingMargin.nextTarget || '—', c.operatingMargin.actual || '—'],
-    ['グループ粗利益', c.grossProfit.prev || '—', c.grossProfit.target || '—', c.grossProfit.growth || '—', c.grossProfit.nextTarget || '—', c.grossProfit.actual || '—'],
-  ], [2.2, 1.5, 1.5, 1.0, 1.2, 1.5]);
+    ['グループ営業利益', c.operatingProfit.prev || '—', c.operatingProfit.target || '—', c.operatingProfit.actual || '—', calcGrowth(c.operatingProfit.prev, c.operatingProfit.actual), c.operatingProfit.nextTarget || '—'],
+    ['グループ営業利益率', c.operatingMargin.prev || '—', c.operatingMargin.target || '—', c.operatingMargin.actual || '—', calcGrowth(c.operatingMargin.prev, c.operatingMargin.actual), c.operatingMargin.nextTarget || '—'],
+    ['グループ粗利益', c.grossProfit.prev || '—', c.grossProfit.target || '—', c.grossProfit.actual || '—', calcGrowth(c.grossProfit.prev, c.grossProfit.actual), c.grossProfit.nextTarget || '—'],
+  ], [2.2, 1.5, 1.5, 1.5, 1.0, 2.0]);
   y += 0.3 + 0.28 * 3;
 
   // ③ 今期テーマ（戦略的フォーカス）
@@ -194,15 +201,15 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
   // ② 部署KPI目標
   addSectionLabel(sl, y, '② 部署KPI目標');
   y += 0.3;
-  const KPI_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '成長率(%)', '来期目標', '今期実績\n2026.4〜9'];
+  const KPI_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '今期実績\n2026.4〜9', '成長率(%)', '来期目標'];
   const kpiData = [
     { label: `主要KPI①（${c.kpi1.label || '　　　'}）`, r: c.kpi1 },
     { label: `主要KPI②（${c.kpi2.label || '　　　'}）`, r: c.kpi2 },
     { label: `主要KPI③（${c.kpi3.label || '　　　'}）`, r: c.kpi3 },
   ];
   addTable(sl, y, ['KPI', ...KPI_COLS],
-    kpiData.map(k => [k.label, k.r.prev || '—', k.r.target || '—', k.r.growth || '—', k.r.nextTarget || '—', k.r.actual || '—']),
-    [2.8, 1.4, 1.4, 1.0, 1.2, 1.4]);
+    kpiData.map(k => [k.label, k.r.prev || '—', k.r.target || '—', k.r.actual || '—', calcGrowth(k.r.prev, k.r.actual), k.r.nextTarget || '—']),
+    [2.8, 1.4, 1.4, 1.4, 1.0, 1.8]);
   y += 0.3 + 0.28 * 3;
 
   // ③ 今期の重点施策

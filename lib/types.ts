@@ -10,9 +10,8 @@ export interface CoverData {
 export interface KpiNumRow {
   prev: string;
   target: string;
-  growth: string;
-  nextTarget: string;
   actual: string;
+  nextTarget: string;
 }
 
 export interface CompanyGoalData {
@@ -33,9 +32,8 @@ export interface DeptKpiNumRow {
   label: string;
   prev: string;
   target: string;
-  growth: string;
-  nextTarget: string;
   actual: string;
+  nextTarget: string;
 }
 
 export interface DeptGoalData {
@@ -160,8 +158,8 @@ export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flat
     }))
 );
 
-const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', growth: '', nextTarget: '', actual: '' });
-const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', growth: '', nextTarget: '', actual: '' });
+const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '', nextTarget: '' });
+const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', nextTarget: '' });
 
 export function createDefaultFormData(): FormData {
   return {

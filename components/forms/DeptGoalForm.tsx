@@ -10,6 +10,13 @@ const toNumeric = (v: string) =>
   v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
    .replace(/[^0-9.\-,]/g, '');
 
+function calcGrowth(prev: string, actual: string): string {
+  const p = parseFloat(prev.replace(/,/g, ''));
+  const a = parseFloat(actual.replace(/,/g, ''));
+  if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
+  return `${Math.round((a / p - 1) * 100)}%`;
+}
+
 function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
   return (
     <input
@@ -23,12 +30,11 @@ function TI({ value, onChange, placeholder, numeric }: { value: string; onChange
   );
 }
 
-const KPI_COLS = [
-  { key: 'prev' as const, label: '前期実績', sub: '2025.10〜2026.3' },
-  { key: 'target' as const, label: '今期目標', sub: '2026.4〜9' },
-  { key: 'growth' as const, label: '成長率', sub: '%' },
-  { key: 'nextTarget' as const, label: '来期目標', sub: '' },
-  { key: 'actual' as const, label: '今期実績', sub: '2026.4〜9' },
+const KPI_COLS: { key: keyof DeptKpiNumRow; label: string; sub: string; numeric?: boolean }[] = [
+  { key: 'prev', label: '前期実績', sub: '2025.10〜2026.3', numeric: true },
+  { key: 'target', label: '今期目標', sub: '2026.4〜9', numeric: true },
+  { key: 'actual', label: '今期実績', sub: '2026.4〜9', numeric: true },
+  { key: 'nextTarget', label: '来期目標', sub: '' },
 ];
 
 export default function DeptGoalForm({ data, onChange }: Props) {
@@ -90,6 +96,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                   {c.sub && <span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7 }}>{c.sub}</span>}
                 </th>
               ))}
+              <th>成長率<span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7 }}>自動計算（%）</span></th>
             </tr>
           </thead>
           <tbody>
@@ -108,11 +115,14 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                     <TI
                       value={data[item.key][c.key]}
                       onChange={v => updateKpi(item.key, c.key, v)}
-                      placeholder="0"
-                      numeric
+                      placeholder={c.numeric ? '0' : '自由記入'}
+                      numeric={c.numeric}
                     />
                   </td>
                 ))}
+                <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                  {calcGrowth(data[item.key].prev, data[item.key].actual)}
+                </td>
               </tr>
             ))}
           </tbody>
