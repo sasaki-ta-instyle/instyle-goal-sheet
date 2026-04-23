@@ -13,15 +13,25 @@ function Toggle({ value, onChange, label, description }: {
   description?: string;
 }) {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: 16,
-      padding: '14px 16px',
-      background: value === 1 ? 'rgba(123,183,133,.10)' : 'rgba(230,226,215,.30)',
-      borderRadius: 'var(--r)',
-      cursor: 'pointer',
-    }} onClick={() => onChange(value === 1 ? 0 : 1)}>
+    <button
+      type="button"
+      aria-pressed={value === 1}
+      onClick={() => onChange(value === 1 ? 0 : 1)}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 16,
+        padding: '14px 16px',
+        background: value === 1 ? 'rgba(123,183,133,.10)' : 'rgba(230,226,215,.30)',
+        borderRadius: 'var(--r)',
+        cursor: 'pointer',
+        width: '100%',
+        textAlign: 'left',
+        border: 'none',
+        font: 'inherit',
+        color: 'inherit',
+      }}
+    >
       <div style={{
         flexShrink: 0,
         width: 24,
@@ -46,7 +56,7 @@ function Toggle({ value, onChange, label, description }: {
       <div style={{ marginLeft: 'auto', fontSize: '.75rem', fontWeight: 600, color: value === 1 ? '#2d7a3a' : 'var(--color-text-muted)', flexShrink: 0 }}>
         {value === 1 ? '1pt' : '0pt'}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -55,10 +65,11 @@ export default function BonusForm({ data, onChange }: Props) {
     onChange({ ...data, [key]: value });
 
   const phase1Total = data.canAfford + data.hasProfit + data.futureProfit;
+  const supervisorPoints = data.supervisorEval * (data.noSupervisor ? 2 : 1);
   const phase2Total =
     data.deptKpiAchieved +
     data.personalKpiAchieved +
-    data.supervisorEval +
+    supervisorPoints +
     data.valueEval +
     data.reproducibility +
     data.roleAchievement +
@@ -141,7 +152,21 @@ export default function BonusForm({ data, onChange }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <Toggle value={data.deptKpiAchieved} onChange={v => set('deptKpiAchieved', v)} label="④ 部署KPI達成" description="期初設定・合意した主要KPIを達成している" />
           <Toggle value={data.personalKpiAchieved} onChange={v => set('personalKpiAchieved', v)} label="⑤ 個人KPI達成" description="個人KPI達成、または未達でもそれを補う明確な成果あり" />
-          <Toggle value={data.supervisorEval} onChange={v => set('supervisorEval', v)} label="⑥ 直属上司評価" description="当期の貢献度を総合的に見て明確に評価できる（※不在時は重み2倍）" />
+          <Toggle
+            value={data.supervisorEval}
+            onChange={v => set('supervisorEval', v)}
+            label={`⑥ 直属上司評価${data.noSupervisor ? '（上司不在・重み2倍）' : ''}`}
+            description="当期の貢献度を総合的に見て明確に評価できる"
+          />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 16px', fontSize: '.8125rem', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={data.noSupervisor}
+              onChange={e => set('noSupervisor', e.target.checked)}
+              style={{ width: 16, height: 16, cursor: 'pointer' }}
+            />
+            直属上司が不在（評価値を2倍として計算）
+          </label>
           <Toggle value={data.valueEval} onChange={v => set('valueEval', v)} label="⑦ 360°評価（バリュー）" description="バリュー体現が一貫。違反や評価の大きな割れなし" />
           <Toggle value={data.reproducibility} onChange={v => set('reproducibility', v)} label="⑧ 再現性・継続性" description="プロセス・仕組みとして説明でき今後も再現可能" />
           <Toggle value={data.roleAchievement} onChange={v => set('roleAchievement', v)} label="⑨ 役割に対する達成度" description="立場・役割・等級として期待された水準を満たしている" />

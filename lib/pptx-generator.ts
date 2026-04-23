@@ -13,7 +13,7 @@ const C = {
   header: 'E6E2D7',
 };
 
-const FONT = 'Noto Sans JP';
+const FONT = '游ゴシック';
 const W = 13.33;
 const H = 7.5;
 
@@ -256,7 +256,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
   addSlideHeader(sl, '04｜Grade表', 'INSTYLE GROUP｜人事制度　5 / 7');
 
   const x0 = 0.4;
-  let y = 1.1;
+  const y = 1.1;
   const rowH = 0.38;
   const colWidths = [0.8, 2.8, 1.2, 1.8, 6.45];
 
@@ -372,6 +372,7 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
   y += 0.3;
 
   const totalPoints = p.tenurePoint + p.deptGrowthPoint + p.personalKpiPoint + p.supervisorPoint + p.mgmtPoint + p.nurturingPoint;
+  const isPromotionEligible = gatePass && totalPoints >= 11;
 
   const evalRows = [
     ['②', '在籍期間', '0〜1pt', `${p.tenurePoint}pt`],
@@ -414,11 +415,15 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
   y += 0.3 + evalRows.length * 0.3 + 0.2;
 
   // 合計
-  const resultText = `合計：${totalPoints}pt　${totalPoints >= 11 ? '→ 昇格・昇給対象' : `→ 昇格・昇給対象外（あと${11 - totalPoints}pt必要）`}`;
+  const resultText = isPromotionEligible
+    ? `合計：${totalPoints}pt　→ 昇格・昇給対象`
+    : !gatePass
+      ? `合計：${totalPoints}pt　→ 昇格・昇給対象外（VALUEゲート未通過）`
+      : `合計：${totalPoints}pt　→ 昇格・昇給対象外（あと${11 - totalPoints}pt必要）`;
   sl.addText(resultText, {
     x: 0.4, y, w: W - 0.8, h: 0.4,
     fontFace: FONT, fontSize: 10, color: C.text, bold: true,
-    fill: { color: totalPoints >= 11 ? 'D4EDD7' : C.surface2 },
+    fill: { color: isPromotionEligible ? 'D4EDD7' : C.surface2 },
     inset: 0.08,
   });
 }
@@ -434,14 +439,15 @@ function slide7(prs: InstanceType<typeof pptxgen>, d: FormData) {
   let y = 1.05;
 
   const phase1Total = b.canAfford + b.hasProfit + b.futureProfit;
+  const supervisorPoints = b.supervisorEval * (b.noSupervisor ? 2 : 1);
   const phase2Total =
-    b.deptKpiAchieved + b.personalKpiAchieved + b.supervisorEval +
+    b.deptKpiAchieved + b.personalKpiAchieved + supervisorPoints +
     b.valueEval + b.reproducibility + b.roleAchievement +
     b.difficulty + b.mgmtEval;
   const phase1Pass = phase1Total >= 3;
   const bonusAmount = phase1Pass ? phase2Total * 110000 : 0;
 
-  const pt = (v: number) => v === 1 ? '1' : '0';
+  const pt = (v: number, weight = 1) => v === 1 ? String(weight) : '0';
 
   // Phase 1
   addSectionLabel(sl, y, 'Phase 1：財務ゲート（合計3未満でボーナス0）');
@@ -467,7 +473,7 @@ function slide7(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addTable(sl, y, ['#', '評価項目', '採点(0/1)'], [
     ['④', '部署KPI達成', pt(b.deptKpiAchieved)],
     ['⑤', '個人KPI達成', pt(b.personalKpiAchieved)],
-    ['⑥', '直属上司評価', pt(b.supervisorEval)],
+    ['⑥', b.noSupervisor ? '直属上司評価（上司不在・重み2倍）' : '直属上司評価', pt(b.supervisorEval, b.noSupervisor ? 2 : 1)],
     ['⑦', '360°評価（バリュー）', pt(b.valueEval)],
     ['⑧', '再現性・継続性', pt(b.reproducibility)],
     ['⑨', '役割に対する達成度', pt(b.roleAchievement)],
@@ -500,7 +506,8 @@ export async function generatePptx(data: FormData) {
   slide6(prs, data);
   slide7(prs, data);
 
-  const name = data.cover.name || '社員';
-  const period = data.cover.period || '期間';
+  const sanitize = (s: string) => s.replace(/[\\/:*?"<>|]/g, '_');
+  const name = sanitize(data.cover.name || '社員');
+  const period = sanitize(data.cover.period || '期間');
   await prs.writeFile({ fileName: `目標設定シート_${name}_${period}.pptx` });
 }

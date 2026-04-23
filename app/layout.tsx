@@ -1,5 +1,20 @@
 import type { Metadata } from "next";
+import { Lato, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
+
+const lato = Lato({
+  weight: ['100', '300', '400', '700'],
+  subsets: ['latin'],
+  variable: '--font-lato',
+  display: 'swap',
+});
+
+const notoSansJP = Noto_Sans_JP({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-noto-sans-jp',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "目標設定シート | INSTYLE GROUP",
@@ -12,12 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="ja" className={`${lato.variable} ${notoSansJP.variable}`}>
       <body>{children}</body>
     </html>
   );

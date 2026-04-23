@@ -87,6 +87,7 @@ export interface BonusData {
   deptKpiAchieved: number;
   personalKpiAchieved: number;
   supervisorEval: number;
+  noSupervisor: boolean;
   valueEval: number;
   reproducibility: number;
   roleAchievement: number;
@@ -201,6 +202,7 @@ export function createDefaultFormData(): FormData {
       deptKpiAchieved: 0,
       personalKpiAchieved: 0,
       supervisorEval: 0,
+      noSupervisor: false,
       valueEval: 0,
       reproducibility: 0,
       roleAchievement: 0,

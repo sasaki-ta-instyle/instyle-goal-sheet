@@ -30,6 +30,12 @@ export default function Home() {
   const updateGradeExpectations = (d: FormData['gradeExpectations']) => setFormData(prev => ({ ...prev, gradeExpectations: d }));
 
   const handleDownload = async () => {
+    const { cover } = formData;
+    if (!cover.name || !cover.company || !cover.grade || !cover.period) {
+      alert('カバー情報（所属法人・氏名・Grade・期）をすべて入力してください。');
+      setStep(1);
+      return;
+    }
     setIsGenerating(true);
     try {
       const { generatePptx } = await import('@/lib/pptx-generator');
@@ -146,13 +152,26 @@ export default function Home() {
 
 function ConfirmView({ data }: { data: FormData }) {
   const phase1Total = data.bonus.canAfford + data.bonus.hasProfit + data.bonus.futureProfit;
+  const supervisorPoints = data.bonus.supervisorEval * (data.bonus.noSupervisor ? 2 : 1);
   const phase2Total =
-    data.bonus.deptKpiAchieved + data.bonus.personalKpiAchieved + data.bonus.supervisorEval +
+    data.bonus.deptKpiAchieved + data.bonus.personalKpiAchieved + supervisorPoints +
     data.bonus.valueEval + data.bonus.reproducibility + data.bonus.roleAchievement +
     data.bonus.difficulty + data.bonus.mgmtEval;
   const promotionTotal =
     data.promotion.tenurePoint + data.promotion.deptGrowthPoint + data.promotion.personalKpiPoint +
     data.promotion.supervisorPoint + data.promotion.mgmtPoint + data.promotion.nurturingPoint;
+
+  const valueNum = parseFloat(data.promotion.valueScore);
+  const promotionGatePass = !isNaN(valueNum) && data.promotion.valueScore !== '' && valueNum >= 3.5;
+  const isPromotionEligible = promotionGatePass && promotionTotal >= 11;
+
+  const promotionLabel = data.promotion.valueScore === ''
+    ? `${promotionTotal}pt`
+    : isPromotionEligible
+      ? `${promotionTotal}pt（昇格対象）`
+      : !promotionGatePass
+        ? `${promotionTotal}pt（VALUEゲート未通過）`
+        : `${promotionTotal}pt（あと${11 - promotionTotal}pt）`;
 
   const rows = [
     { label: '所属法人', value: data.cover.company || '（未入力）' },
@@ -160,7 +179,7 @@ function ConfirmView({ data }: { data: FormData }) {
     { label: 'Grade', value: data.cover.grade || '（未入力）' },
     { label: '期', value: data.cover.period || '（未入力）' },
     { label: '個人目標数', value: `${data.personal.smartGoals.filter(r => r.goal).length} 件` },
-    { label: '昇格評価合計', value: `${promotionTotal}pt${promotionTotal >= 11 ? '（昇格対象）' : ''}` },
+    { label: '昇格評価合計', value: promotionLabel },
     { label: 'ボーナス支給額', value: phase1Total >= 3 ? `${(phase2Total * 110000).toLocaleString('ja-JP')}円` : '0円（財務ゲート未通過）' },
   ];
 

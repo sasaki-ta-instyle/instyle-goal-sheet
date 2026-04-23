@@ -33,7 +33,7 @@
   --r-xl:   32px;
   --r-pill: 999px;
 
-  --font-sans: 'Lato','Noto Sans JP',sans-serif;
+  --font-sans: var(--font-lato, 'Lato'), var(--font-noto-sans-jp, 'Noto Sans JP'), sans-serif;
   --ease-out: 250ms cubic-bezier(.4,0,.2,1);
 }
 

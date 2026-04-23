@@ -225,10 +225,12 @@ export default function PromotionForm({ data, onChange }: Props) {
       <div style={{
         marginTop: 28,
         padding: '20px 24px',
-        background: totalPoints >= 11
-          ? 'rgba(123,183,133,.14)'
-          : 'rgba(230,226,215,.45)',
-        border: `1px solid ${totalPoints >= 11 ? 'rgba(123,183,133,.35)' : 'rgba(53,54,45,.12)'}`,
+        background: gateKnown && !gatePass
+          ? 'rgba(220,38,38,.06)'
+          : gatePass && totalPoints >= 11
+            ? 'rgba(123,183,133,.14)'
+            : 'rgba(230,226,215,.45)',
+        border: `1px solid ${gatePass && totalPoints >= 11 ? 'rgba(123,183,133,.35)' : 'rgba(53,54,45,.12)'}`,
         borderRadius: 'var(--r)',
         display: 'flex',
         alignItems: 'center',
@@ -242,7 +244,7 @@ export default function PromotionForm({ data, onChange }: Props) {
             <span style={{ fontSize: '1rem', fontWeight: 400, marginLeft: 4 }}>pt</span>
           </p>
         </div>
-        {totalPoints >= 11 && (
+        {gatePass && totalPoints >= 11 && (
           <div style={{
             padding: '10px 18px',
             background: 'rgba(123,183,133,.25)',
@@ -251,10 +253,15 @@ export default function PromotionForm({ data, onChange }: Props) {
             fontWeight: 700,
             color: '#2d7a3a',
           }}>
-            ✓ 昇格・昇給対象（11pt以上）
+            ✓ 昇格・昇給対象（11pt以上 ＋ ゲート通過）
           </div>
         )}
-        {totalPoints < 11 && (
+        {gateKnown && !gatePass && (
+          <p style={{ fontSize: '.8125rem', color: '#b91c1c', fontWeight: 600 }}>
+            ✗ 昇格不可（VALUEスコアが3.50未満）
+          </p>
+        )}
+        {(!gateKnown || gatePass) && totalPoints < 11 && (
           <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)' }}>
             昇格・昇給には合計11pt以上が必要です（あと{11 - totalPoints}pt）
           </p>
