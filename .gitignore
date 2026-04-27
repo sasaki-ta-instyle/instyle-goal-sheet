@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.env.app
+.env.base
+
+# build staging for ConoHa deploy workflow
+_deploy/
 
 # vercel
 .vercel
