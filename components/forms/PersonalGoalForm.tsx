@@ -42,7 +42,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
 
   return (
     <div>
-      <p className="section-title">スライド 4 — 03｜個人目標 記入シート</p>
+      <p className="section-title">03｜個人目標 記入シート</p>
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 現在地の確認</p>
       <div className="table-wrap" style={{ marginBottom: 24 }}>
@@ -89,7 +89,7 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
               <tr key={i}>
                 <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>目標{i + 1}</td>
                 <td><TI value={row.goal} onChange={v => updateSmart(i, 'goal', v)} placeholder="具体的な目標" /></td>
-                <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" numeric /></td>
+                <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" /></td>
                 <td><TI value={row.deadline} onChange={v => updateSmart(i, 'deadline', v)} placeholder="〇月末" /></td>
                 <td><TI value={row.note} onChange={v => updateSmart(i, 'note', v)} placeholder="関連目標など" /></td>
               </tr>

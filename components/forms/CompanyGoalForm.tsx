@@ -6,15 +6,22 @@ interface Props {
   onChange: (data: CompanyGoalData) => void;
 }
 
-const toNumeric = (v: string) =>
-  v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-   .replace(/[^0-9.\-,]/g, '');
+const toNumeric = (v: string) => {
+  const raw = v
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[^0-9.]/g, '');
+  if (!raw) return '';
+  const parts = raw.split('.');
+  parts[0] = parts[0] ? Number(parts[0]).toLocaleString('ja-JP') : '';
+  return parts.length > 1 ? `${parts[0]}.${parts[1]}` : parts[0];
+};
 
 function calcGrowth(prev: string, actual: string): string {
   const p = parseFloat(prev.replace(/,/g, ''));
   const a = parseFloat(actual.replace(/,/g, ''));
   if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
-  return `${Math.round((a / p - 1) * 100)}%`;
+  const val = Math.round((a / p - 1) * 100);
+  return `${val > 0 ? '+' : ''}${val}%`;
 }
 
 function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
@@ -31,10 +38,9 @@ function TI({ value, onChange, placeholder, numeric }: { value: string; onChange
 }
 
 const NUM_COLS: { key: keyof KpiNumRow; label: string; sub: string; numeric?: boolean }[] = [
-  { key: 'prev', label: '前期実績', sub: '2025.10〜2026.3', numeric: true },
-  { key: 'target', label: '今期目標', sub: '2026.4〜9', numeric: true },
-  { key: 'actual', label: '今期実績', sub: '2026.4〜9', numeric: true },
-  { key: 'nextTarget', label: '来期目標', sub: '' },
+  { key: 'prev', label: '前期実績（円）', sub: '2025.10〜2026.3', numeric: true },
+  { key: 'target', label: '今期目標（円）', sub: '2026.4〜9', numeric: true },
+  { key: 'actual', label: '今期実績（円）', sub: '2026.4〜9', numeric: true },
 ];
 
 function KpiNumTable({
@@ -56,7 +62,8 @@ function KpiNumTable({
                 {c.sub && <span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7 }}>{c.sub}</span>}
               </th>
             ))}
-            <th>成長率<span style={{ display: 'block', fontWeight: 400, fontSize: '.7rem', opacity: 0.7 }}>自動計算（%）</span></th>
+            <th>成長率<span style={{ display: 'block' }}>（％）</span></th>
+            <th>来期目標</th>
           </tr>
         </thead>
         <tbody>
@@ -70,6 +77,15 @@ function KpiNumTable({
               ))}
               <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
                 {calcGrowth(row.data.prev, row.data.actual)}
+              </td>
+              <td>
+                <textarea
+                  className="input"
+                  style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
+                  value={row.data.nextTarget}
+                  onChange={e => onUpdate(i, 'nextTarget', e.target.value)}
+                  placeholder="自由記入"
+                />
               </td>
             </tr>
           ))}
@@ -97,7 +113,7 @@ export default function CompanyGoalForm({ data, onChange }: Props) {
 
   return (
     <div>
-      <p className="section-title">スライド 2 — 01｜会社目標 記入シート</p>
+      <p className="section-title">01｜会社目標 記入シート</p>
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 売上</p>
       <KpiNumTable
@@ -111,25 +127,14 @@ export default function CompanyGoalForm({ data, onChange }: Props) {
         onUpdate={(i, field, value) => updateProfitRow(profitRows[i].rowKey, field, value)}
       />
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 今期テーマ（戦略的フォーカス）</p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {([0, 1] as const).map(i => (
-          <div key={i}>
-            <label className="form-label">テーマ {i + 1}</label>
-            <input
-              className="input"
-              type="text"
-              placeholder="今期の戦略的フォーカスを記入"
-              value={data.strategicFocus[i]}
-              onChange={e => {
-                const updated: [string, string] = [...data.strategicFocus] as [string, string];
-                updated[i] = e.target.value;
-                set('strategicFocus', updated);
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 来期テーマ（戦略的フォーカス）</p>
+      <textarea
+        className="input"
+        style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem' }}
+        placeholder="来期の戦略的フォーカスを記入"
+        value={data.strategicFocus}
+        onChange={e => set('strategicFocus', e.target.value)}
+      />
     </div>
   );
 }

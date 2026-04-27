@@ -11,12 +11,12 @@ export default function CoverForm({ data, onChange }: Props) {
 
   return (
     <div>
-      <p className="section-title">スライド 1 — カバー</p>
+      <p className="section-title">カバー</p>
       <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: 28 }}>
         目標設定シートの表紙情報を入力してください。
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+      <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
         <div>
           <label className="form-label">所属法人</label>
           <input
@@ -39,9 +39,9 @@ export default function CoverForm({ data, onChange }: Props) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div>
-          <label className="form-label">Grade</label>
+          <label className="form-label">グレード</label>
           <select
             className="input"
             value={data.grade}
@@ -55,13 +55,9 @@ export default function CoverForm({ data, onChange }: Props) {
         </div>
         <div>
           <label className="form-label">期</label>
-          <input
-            className="input"
-            type="text"
-            placeholder="例: 2026.4〜9"
-            value={data.period}
-            onChange={e => set('period', e.target.value)}
-          />
+          <div className="input" style={{ color: 'var(--color-text-muted)', userSelect: 'none' }}>
+            2026.4〜9
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StepIndicator from '@/components/StepIndicator';
 import CoverForm from '@/components/forms/CoverForm';
 import CompanyGoalForm from '@/components/forms/CompanyGoalForm';
@@ -11,11 +11,63 @@ import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
 import { createDefaultFormData, FormData } from '@/lib/types';
 
+const STORAGE_KEY = 'instyle-goal-sheet-v1';
+
 export default function Home() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>(createDefaultFormData);
+  const [formData, setFormData] = useState<FormData>(() => {
+    if (typeof window === 'undefined') return createDefaultFormData();
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved) as FormData;
+    } catch {}
+    return createDefaultFormData();
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }, [formData]);
+
+  const handleReset = () => {
+    if (!confirm('入力内容をすべてリセットしますか？この操作は元に戻せません。')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    setFormData(createDefaultFormData());
+    setStep(1);
+    setGenerated(false);
+  };
+
+  const handleExport = () => {
+    const json = JSON.stringify(formData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = formData.cover.name || '氏名未入力';
+    const period = formData.cover.period || '';
+    a.href = url;
+    a.download = `goal-sheet_${name}_${period}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result as string) as FormData;
+        setFormData(parsed);
+        setStep(1);
+        setGenerated(false);
+      } catch {
+        alert('ファイルの読み込みに失敗しました。正しいJSONファイルを選択してください。');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   const navigate = (s: number) => {
     if (s >= 1 && s <= 8) setStep(s);
@@ -32,7 +84,7 @@ export default function Home() {
   const handleDownload = async () => {
     const { cover } = formData;
     if (!cover.name || !cover.company || !cover.grade || !cover.period) {
-      alert('カバー情報（所属法人・氏名・Grade・期）をすべて入力してください。');
+      alert('カバー情報（所属法人・氏名・グレード・期）をすべて入力してください。');
       setStep(1);
       return;
     }
@@ -55,7 +107,7 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
 
         {/* Header */}
-        <header style={{
+        <header className="site-header" style={{
           padding: '40px 48px 32px',
           position: 'relative',
           overflow: 'hidden',
@@ -71,16 +123,59 @@ export default function Home() {
             background: 'linear-gradient(105deg,rgba(255,90,100,.04) 0%,rgba(255,210,80,.04) 25%,rgba(60,220,160,.05) 50%,rgba(80,160,255,.05) 75%,transparent 100%)',
             pointerEvents: 'none',
           }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <p style={{ fontSize: '.6875rem', fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(243,241,238,.45)', marginBottom: 10 }}>
-              INSTYLE GROUP
-            </p>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-text-inv)', letterSpacing: '-.02em', marginBottom: 6 }}>
-              目標設定シート
-            </h1>
-            <p style={{ fontSize: '.8125rem', color: 'rgba(243,241,238,.45)' }}>
-              入力内容はPPTXスライドとして書き出されます
-            </p>
+          <div className="header-inner" style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <img src="/logo.svg" alt="INSTYLE GROUP" style={{ height: 10, marginBottom: 10, filter: 'brightness(0) invert(1)', opacity: 0.45 }} />
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-text-inv)', letterSpacing: '-.02em', marginBottom: 6 }}>
+                目標設定シート <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.6 }}>2026.4〜9</span>
+              </h1>
+              <p style={{ fontSize: '.8125rem', color: 'rgba(243,241,238,.45)' }}>
+                入力内容は自動保存されます。PPTXスライドとして書き出せます。<br />
+                来期のシート作成に備えて、完成後は「データを保存」（JSON形式）しておきましょう。来期は読み込むだけで引き継げます。
+              </p>
+            </div>
+            <div className="header-buttons" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <label style={{
+                fontSize: '.75rem',
+                color: 'rgba(243,241,238,.45)',
+                background: 'transparent',
+                border: '1px solid rgba(243,241,238,.20)',
+                borderRadius: 'var(--r)',
+                padding: '6px 14px',
+                cursor: 'pointer',
+              }}>
+                データを読み込む
+                <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
+              </label>
+              <button
+                onClick={handleExport}
+                style={{
+                  fontSize: '.75rem',
+                  color: 'rgba(243,241,238,.45)',
+                  background: 'transparent',
+                  border: '1px solid rgba(243,241,238,.20)',
+                  borderRadius: 'var(--r)',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                }}
+              >
+                データを保存
+              </button>
+              <button
+                onClick={handleReset}
+                style={{
+                  fontSize: '.75rem',
+                  color: 'rgba(243,241,238,.45)',
+                  background: 'transparent',
+                  border: '1px solid rgba(243,241,238,.20)',
+                  borderRadius: 'var(--r)',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                }}
+              >
+                入力をリセット
+              </button>
+            </div>
           </div>
         </header>
 
@@ -88,7 +183,7 @@ export default function Home() {
         <StepIndicator current={step} onNavigate={navigate} />
 
         {/* Main content */}
-        <main style={{ maxWidth: 1080, margin: '0 auto', padding: '0 24px 80px' }}>
+        <main className="site-main" style={{ maxWidth: 1080, margin: '0 auto', padding: '0 24px 80px' }}>
 
           {/* Form card */}
           <div className="glass-panel" style={{ marginBottom: 24 }}>
@@ -176,7 +271,7 @@ function ConfirmView({ data }: { data: FormData }) {
   const rows = [
     { label: '所属法人', value: data.cover.company || '（未入力）' },
     { label: '氏名', value: data.cover.name || '（未入力）' },
-    { label: 'Grade', value: data.cover.grade || '（未入力）' },
+    { label: 'グレード', value: data.cover.grade || '（未入力）' },
     { label: '期', value: data.cover.period || '（未入力）' },
     { label: '個人目標数', value: `${data.personal.smartGoals.filter(r => r.goal).length} 件` },
     { label: '昇格評価合計', value: promotionLabel },
@@ -219,7 +314,7 @@ function ConfirmView({ data }: { data: FormData }) {
       }}>
         <strong style={{ color: 'var(--color-text)' }}>出力されるスライド：</strong>
         <br />
-        1. カバー &nbsp; 2. 会社目標 &nbsp; 3. 部署目標 &nbsp; 4. 個人目標 &nbsp; 5. Grade表 &nbsp; 6. 昇格・昇給採点 &nbsp; 7. ボーナス評価採点
+        1. カバー &nbsp; 2. 会社目標 &nbsp; 3. 部署目標 &nbsp; 4. 個人目標 &nbsp; 5. グレード表 &nbsp; 6. 昇格・昇給採点 &nbsp; 7. ボーナス評価採点
       </div>
     </div>
   );

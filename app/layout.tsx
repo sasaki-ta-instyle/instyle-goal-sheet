@@ -19,6 +19,7 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "目標設定シート | INSTYLE GROUP",
   description: "INSTYLE GROUP 目標設定フォーム — 入力内容をPPTXで書き出します",
+  icons: { icon: '/favicon.png' },
 };
 
 export default function RootLayout({

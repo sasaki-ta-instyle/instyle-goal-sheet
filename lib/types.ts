@@ -1,4 +1,4 @@
-export type Grade = 'e' | 'E' | 'l' | 'L' | 'y' | 'Y' | 't' | 'T' | 's' | 'S' | 'n' | 'N' | 'i' | 'I';
+export type Grade = 'I' | "N'" | 'N' | "n'" | 'n' | "S'" | 'S' | "s'" | 's' | "T'" | 'T' | "t'" | 't' | "Y'" | 'Y' | "y'" | 'y' | "L'" | 'L' | "l'" | 'l' | "E'" | 'E' | "e'" | 'e';
 
 export interface CoverData {
   company: string;
@@ -19,7 +19,7 @@ export interface CompanyGoalData {
   operatingProfit: KpiNumRow;
   operatingMargin: KpiNumRow;
   grossProfit: KpiNumRow;
-  strategicFocus: [string, string];
+  strategicFocus: string;
 }
 
 export interface DeptActionRow {
@@ -93,7 +93,7 @@ export interface BonusData {
   mgmtEval: number;
 }
 
-export type GradeExpectations = Partial<Record<Grade, string>>;
+export type GradeExpectations = Partial<Record<string, string>>;
 
 export interface FormData {
   cover: CoverData;
@@ -119,42 +119,51 @@ export interface GradeTier {
 export const GRADE_TABLE: GradeTier[] = [
   { tier: 'I', tierName: 'INDEPENDENT and IDEAL', grades: [
     { key: 'I', salary: '—' },
-    { key: 'i', salary: '—' },
   ]},
   { tier: 'N', tierName: 'NO RULES and NEVER SAY NEVER', grades: [
-    { key: 'N', salary: '1,110,000' },
-    { key: 'n', salary: '1,000,000' },
+    { key: 'N',  salary: '1,170,000' },
+    { key: "N'", salary: '1,110,000' },
+    { key: 'n',  salary: '1,055,000' },
+    { key: "n'", salary: '1,000,000' },
   ]},
   { tier: 'S', tierName: 'STRATEGIC', grades: [
-    { key: 'S', salary: '900,000' },
-    { key: 's', salary: '800,000' },
+    { key: 'S',  salary: '950,000' },
+    { key: "S'", salary: '900,000' },
+    { key: 's',  salary: '845,000' },
+    { key: "s'", salary: '800,000' },
   ]},
   { tier: 'T', tierName: 'TACTICAL', grades: [
-    { key: 'T', salary: '700,000' },
-    { key: 't', salary: '600,000' },
+    { key: 'T',  salary: '740,000' },
+    { key: "T'", salary: '700,000' },
+    { key: 't',  salary: '650,000' },
+    { key: "t'", salary: '600,000' },
   ]},
   { tier: 'Y', tierName: 'YEARNING', grades: [
-    { key: 'Y', salary: '550,000' },
-    { key: 'y', salary: '500,000' },
+    { key: 'Y',  salary: '580,000' },
+    { key: "Y'", salary: '550,000' },
+    { key: 'y',  salary: '525,000' },
+    { key: "y'", salary: '500,000' },
   ]},
   { tier: 'L', tierName: 'LOYALTY', grades: [
-    { key: 'L', salary: '450,000' },
-    { key: 'l', salary: '400,000' },
+    { key: 'L',  salary: '475,000' },
+    { key: "L'", salary: '450,000' },
+    { key: 'l',  salary: '420,000' },
+    { key: "l'", salary: '400,000' },
   ]},
   { tier: 'E', tierName: 'ENTRY', grades: [
-    { key: 'E', salary: '370,000' },
-    { key: 'e', salary: '330,000' },
+    { key: 'E',  salary: '385,000' },
+    { key: "E'", salary: '370,000' },
+    { key: 'e',  salary: '350,000' },
+    { key: "e'", salary: '330,000' },
   ]},
 ];
 
-const HIDDEN_GRADES: Grade[] = ['N', 'n'];
-
 export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flatMap(tier =>
   tier.grades
-    .filter(g => !HIDDEN_GRADES.includes(g.key))
+    .filter(g => g.key !== 'I')
     .map(g => ({
       value: g.key,
-      label: g.salary === '—' ? g.key : `${g.key}  (${g.salary}円/月)`,
+      label: `${g.key}  (${g.salary}円/月)`,
     }))
 );
 
@@ -163,13 +172,13 @@ const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '',
 
 export function createDefaultFormData(): FormData {
   return {
-    cover: { company: '', name: '', grade: '', period: '' },
+    cover: { company: '', name: '', grade: '', period: '2026.4〜9' },
     company: {
       revenue: emptyKpiNum(),
       operatingProfit: emptyKpiNum(),
       operatingMargin: emptyKpiNum(),
       grossProfit: emptyKpiNum(),
-      strategicFocus: ['', ''],
+      strategicFocus: '',
     },
     dept: {
       strategicFocusRef: '',

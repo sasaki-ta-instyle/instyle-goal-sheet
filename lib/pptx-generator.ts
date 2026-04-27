@@ -19,7 +19,8 @@ function calcGrowth(prev: string, actual: string): string {
   const p = parseFloat((prev || '').replace(/,/g, ''));
   const a = parseFloat((actual || '').replace(/,/g, ''));
   if (!prev || !actual || isNaN(p) || isNaN(a) || p === 0) return '—';
-  return `${Math.round((a / p - 1) * 100)}%`;
+  const val = Math.round((a / p - 1) * 100);
+  return `${val > 0 ? '+' : ''}${val}%`;
 }
 const W = 13.33;
 const H = 7.5;
@@ -112,7 +113,7 @@ function slide1(prs: InstanceType<typeof pptxgen>, d: FormData) {
     align: 'left',
   });
 
-  sl.addText('会社目標 ／ 部署目標 ／ 個人目標 ／ Grade表 ／ 昇格・昇給 ／ ボーナス評価', {
+  sl.addText('会社目標 ／ 部署目標 ／ 個人目標 ／ グレード表 ／ 昇格・昇給 ／ ボーナス評価', {
     x: 0.5, y: 2.2, w: W - 1, h: 0.4,
     fontFace: FONT, fontSize: 9, color: 'A0A098', bold: false,
     align: 'left',
@@ -122,7 +123,7 @@ function slide1(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const rows = [
     { label: '所属法人', value: d.cover.company || '—' },
     { label: '氏名', value: d.cover.name || '—' },
-    { label: 'Grade', value: d.cover.grade || '—' },
+    { label: 'グレード', value: d.cover.grade || '—' },
     { label: '期', value: d.cover.period || '—' },
   ];
   rows.forEach((r, i) => {
@@ -152,7 +153,7 @@ function slide2(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const c = d.company;
   let y = 1.05;
 
-  const NUM_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '今期実績\n2026.4〜9', '成長率(%)', '来期目標'];
+  const NUM_COLS = ['前期実績（円）\n2025.10〜2026.3', '今期目標（円）\n2026.4〜9', '今期実績（円）\n2026.4〜9', '成長率(%)', '来期目標'];
 
   // ① 売上
   addSectionLabel(sl, y, '① 売上');
@@ -172,12 +173,10 @@ function slide2(prs: InstanceType<typeof pptxgen>, d: FormData) {
   ], [2.2, 1.5, 1.5, 1.5, 1.0, 2.0]);
   y += 0.3 + 0.28 * 3;
 
-  // ③ 今期テーマ（戦略的フォーカス）
-  addSectionLabel(sl, y, '③ 今期テーマ（戦略的フォーカス）');
+  // ③ 来期テーマ（戦略的フォーカス）
+  addSectionLabel(sl, y, '③ 来期テーマ（戦略的フォーカス）');
   y += 0.3;
-  const halfW = (W - 0.8 - 0.16) / 2;
-  textBox(sl, 0.4, y, halfW, 0.6, c.strategicFocus[0] || '—');
-  textBox(sl, 0.4 + halfW + 0.16, y, halfW, 0.6, c.strategicFocus[1] || '—');
+  textBox(sl, 0.4, y, W - 0.8, 0.6, c.strategicFocus || '—');
 }
 
 // スライド3: 部署目標
@@ -212,8 +211,8 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
     [2.8, 1.4, 1.4, 1.4, 1.0, 1.8]);
   y += 0.3 + 0.28 * 3;
 
-  // ③ 今期の重点施策
-  addSectionLabel(sl, y, '③ 今期の重点施策（KPIを達成するための行動）');
+  // ③ 来期の重点施策
+  addSectionLabel(sl, y, '③ 来期の重点施策（KPIを達成するための行動）');
   y += 0.3;
   const actionRows = c.actions.map((r, i) => [
     `${i + 1}`, r.content || '—', r.expectedEffect || '—', r.deadline || '—',
@@ -255,17 +254,16 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   addTable(sl, y, ['部署KPI', '自分の担当分'], kpiRows, [6.0, W - 0.8 - 6.0]);
 }
 
-// スライド5: Grade表
+// スライド5: グレード表
 function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expectations: Record<string, string>) {
   const sl = prs.addSlide();
   sl.background = { color: C.bg };
 
-  addSlideHeader(sl, '04｜Grade表', 'INSTYLE GROUP｜人事制度　5 / 7');
+  addSlideHeader(sl, '04｜グレード表', 'INSTYLE GROUP｜人事制度　5 / 7');
 
   const x0 = 0.4;
   const y = 1.1;
-  const rowH = 0.38;
-  // 合計 = W - x0*2 = 13.33 - 0.8 = 12.53
+  const rowH = 0.32;
   const colWidths = [0.7, 2.4, 1.0, 1.83, 6.6];
 
   sl.addText('現在値に○をつけてください', {
@@ -273,7 +271,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
     fontFace: FONT, fontSize: 8, color: C.muted,
   });
 
-  const headers = ['ティア', '名称', 'Grade', '基本給与（円/月）', '各人が各クラスに求める目安'];
+  const headers = ['ティア', '名称', 'グレード', '月給合計（円/月）', '各人が各クラスに求める目安'];
   const tableData: pptxgen.TableRow[] = [
     headers.map(h => ({
       text: h,
@@ -286,14 +284,15 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
     })),
   ];
 
+  const expKey = (key: string) => key.replace("'", '');
+
   GRADE_TABLE.forEach(tier => {
-    tier.grades.forEach((entry, gIdx) => {
+    const grades = tier.grades;
+    grades.forEach((entry, gIdx) => {
       const isSelected = entry.key === selectedGrade;
       const fillColor = isSelected ? 'D8D4CA' : gIdx % 2 === 0 ? C.surface : C.surface2;
-
       const row: pptxgen.TableRow = [];
 
-      // rowspan セルは最初の行のみ追加。2行目以降は省略（pptxgenjs の rowspan 仕様）
       if (gIdx === 0) {
         row.push({
           text: tier.tier,
@@ -302,20 +301,21 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             color: C.text,
             fill: { color: 'E0DDD4' },
             align: 'center' as const,
-            rowspan: tier.grades.length,
+            rowspan: grades.length,
+          },
+        });
+        row.push({
+          text: tier.tierName,
+          options: {
+            fontSize: 7, fontFace: FONT, color: C.muted,
+            fill: { color: C.surface },
+            align: 'left' as const,
+            rowspan: grades.length,
           },
         });
       }
 
       row.push(
-        {
-          text: gIdx === 0 ? tier.tierName : '',
-          options: {
-            fontSize: 7, fontFace: FONT, color: C.muted,
-            fill: { color: fillColor },
-            align: 'left' as const,
-          },
-        },
         {
           text: isSelected ? `○ ${entry.key}` : entry.key,
           options: {
@@ -334,15 +334,21 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             align: 'right' as const,
           },
         },
-        {
-          text: expectations[entry.key] || '',
+      );
+
+      // 期待値セル: 大文字ペア(gIdx=0)と小文字ペア(gIdx=2)のみrowspan=2で追加
+      if (grades.length === 1 || gIdx === 0 || gIdx === 2) {
+        const span = grades.length === 1 ? 1 : 2;
+        row.push({
+          text: expectations[expKey(entry.key)] || '',
           options: {
             fontSize: 8, fontFace: FONT, color: C.text,
-            fill: { color: fillColor },
+            fill: { color: C.surface },
             align: 'left' as const,
+            rowspan: span,
           },
-        },
-      );
+        });
+      }
 
       tableData.push(row);
     });

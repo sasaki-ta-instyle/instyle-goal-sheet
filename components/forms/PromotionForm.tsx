@@ -50,17 +50,17 @@ function PointSelector({
 
 const DEPT_GROWTH_OPTIONS = [
   { pt: 1, label: '成長なし' },
-  { pt: 2, label: '〜11%未満' },
-  { pt: 3, label: '〜22%未満' },
-  { pt: 4, label: '〜33%未満' },
-  { pt: 5, label: '33%以上' },
+  { pt: 2, label: '〜+11%未満' },
+  { pt: 3, label: '〜+22%未満' },
+  { pt: 4, label: '〜+33%未満' },
+  { pt: 5, label: '+33%以上' },
 ];
 const PERSONAL_KPI_OPTIONS = [
-  { pt: 1, label: '100%未満' },
-  { pt: 2, label: '〜111%未満' },
-  { pt: 3, label: '〜122%未満' },
-  { pt: 4, label: '〜133%未満' },
-  { pt: 5, label: '133%以上' },
+  { pt: 1, label: '未達成' },
+  { pt: 2, label: '〜+11%未満' },
+  { pt: 3, label: '〜+22%未満' },
+  { pt: 4, label: '〜+33%未満' },
+  { pt: 5, label: '+33%以上' },
 ];
 const SUPERVISOR_OPTIONS = [
   { pt: 1, label: '時期尚早' },
@@ -96,7 +96,7 @@ export default function PromotionForm({ data, onChange }: Props) {
 
   return (
     <div>
-      <p className="section-title">スライド 6 — 05｜昇格・昇給 採点シート</p>
+      <p className="section-title">05｜昇格・昇給 採点シート</p>
       <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: 28 }}>
         評価期間ごとに実施。合計11ポイント以上で昇格・昇給対象。
       </p>
@@ -200,7 +200,7 @@ export default function PromotionForm({ data, onChange }: Props) {
         <div style={{ padding: '16px 20px', background: 'rgba(230,226,215,.30)', borderRadius: 'var(--r)' }}>
           <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 8 }}>
             ⑥ 経営評価（代表）
-            <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: 8 }}>1〜5pt</span>
+            <span style={{ fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: 8 }}>1〜5pt（代表面談の際に入力）</span>
           </p>
           <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginBottom: 12 }}>
             ハッピーエンドへの近づき・SMART達成・ユートピア行動

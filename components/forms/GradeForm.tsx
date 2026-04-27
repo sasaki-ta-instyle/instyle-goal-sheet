@@ -7,15 +7,17 @@ interface Props {
   onChange: (expectations: GradeExpectations) => void;
 }
 
+const expectKey = (key: string): string => key.replace("'", '');
+
 export default function GradeForm({ selectedGrade, expectations, onChange }: Props) {
-  const update = (key: Grade, value: string) =>
+  const update = (key: string, value: string) =>
     onChange({ ...expectations, [key]: value });
 
   return (
     <div>
-      <p className="section-title">スライド 5 — 04｜Grade表</p>
+      <p className="section-title">04｜グレード表</p>
       <p style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)', marginBottom: 24 }}>
-        各Gradeに求める目安を入力してください。カバーで選択したGradeをハイライト表示します。
+        各グレードに求める目安を入力してください。カバーで選択したグレードをハイライト表示します。
       </p>
 
       {selectedGrade && (
@@ -29,7 +31,7 @@ export default function GradeForm({ selectedGrade, expectations, onChange }: Pro
           alignItems: 'center',
           gap: 12,
         }}>
-          <span style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)' }}>選択中のGrade:</span>
+          <span style={{ fontSize: '.8125rem', color: 'var(--color-text-muted)' }}>選択中のグレード:</span>
           <span style={{ fontWeight: 700, fontSize: '1rem' }}>{selectedGrade}</span>
         </div>
       )}
@@ -38,81 +40,98 @@ export default function GradeForm({ selectedGrade, expectations, onChange }: Pro
         <table className="data-table" style={{ fontSize: '.875rem' }}>
           <thead>
             <tr>
-              <th>ティア</th>
-              <th>名称</th>
-              <th>Grade</th>
-              <th>基本給与（円/月）</th>
+              <th></th>
+              <th></th>
+              <th style={{ textAlign: 'center' }}>グレード</th>
+              <th style={{ textAlign: 'center' }}>月給合計（円/月）</th>
               <th>各人が各クラスに求める目安</th>
             </tr>
           </thead>
           <tbody>
-            {GRADE_TABLE.flatMap(tier =>
-              tier.grades.map((entry, gIdx) => {
+            {GRADE_TABLE.flatMap(tier => {
+              const grades = tier.grades;
+
+              if (grades.length === 1) {
+                const entry = grades[0];
                 const isSelected = entry.key === selectedGrade;
+                return [(
+                  <tr key={entry.key} style={isSelected ? { background: 'rgba(32,33,26,.12)' } : {}}>
+                    <td style={{ fontWeight: 700, fontSize: '1.125rem', textAlign: 'center', background: 'rgba(32,33,26,.08)', verticalAlign: 'middle' }}>
+                      {tier.tier}
+                    </td>
+                    <td style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', verticalAlign: 'middle' }}>
+                      {tier.tierName}
+                    </td>
+                    <td style={{ fontWeight: 500, whiteSpace: 'nowrap', textAlign: 'center', fontSize: '.75rem' }}>社長</td>
+                    <td style={{ whiteSpace: 'nowrap', textAlign: 'center' }}>{entry.salary}</td>
+                    <td>
+                      <textarea
+                        className="input"
+                        style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 52, resize: 'vertical' }}
+                        value={expectations[expectKey(entry.key)] ?? ''}
+                        onChange={e => update(expectKey(entry.key), e.target.value)}
+                        placeholder={`${tier.tier}に求める目安・行動基準`}
+                      />
+                    </td>
+                  </tr>
+                )];
+              }
+
+              return grades.map((entry, gIdx) => {
+                const isSelected = entry.key === selectedGrade;
+                const eKey = expectKey(entry.key);
+                const showTierCells = gIdx === 0;
+                const showTextarea = gIdx === 0 || gIdx === 2;
+
                 return (
-                  <tr
-                    key={`${tier.tier}-${entry.key}`}
-                    style={isSelected ? { background: 'rgba(32,33,26,.12)' } : {}}
-                  >
-                    {gIdx === 0 && (
+                  <tr key={entry.key} style={isSelected ? { background: 'rgba(32,33,26,.12)' } : {}}>
+                    {showTierCells && (
                       <td
-                        rowSpan={tier.grades.length}
-                        style={{
-                          fontWeight: 700,
-                          fontSize: '1.125rem',
-                          textAlign: 'center',
-                          background: 'rgba(32,33,26,.08)',
-                          verticalAlign: 'middle',
-                        }}
+                        rowSpan={grades.length}
+                        style={{ fontWeight: 700, fontSize: '1.125rem', textAlign: 'center', background: 'rgba(32,33,26,.08)', verticalAlign: 'middle' }}
                       >
                         {tier.tier}
                       </td>
                     )}
-                    {gIdx === 0 && (
+                    {showTierCells && (
                       <td
-                        rowSpan={tier.grades.length}
-                        style={{
-                          fontSize: '.75rem',
-                          color: 'var(--color-text-muted)',
-                          verticalAlign: 'middle',
-                        }}
+                        rowSpan={grades.length}
+                        style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', verticalAlign: 'middle' }}
                       >
                         {tier.tierName}
                       </td>
                     )}
-                    <td style={{ fontWeight: isSelected ? 700 : 500, whiteSpace: 'nowrap' }}>
+                    <td style={{ fontWeight: isSelected ? 700 : 500, whiteSpace: 'nowrap', textAlign: 'center' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                         {isSelected && (
                           <span style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: 18, height: 18,
-                            borderRadius: '50%',
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            width: 18, height: 18, borderRadius: '50%',
                             border: '2px solid var(--color-text)',
-                            fontSize: '.55rem',
-                            fontWeight: 700,
+                            fontSize: '.55rem', fontWeight: 700,
                           }}>○</span>
                         )}
                         {entry.key}
                       </span>
                     </td>
-                    <td style={{ fontWeight: isSelected ? 700 : 400, whiteSpace: 'nowrap' }}>
+                    <td style={{ fontWeight: isSelected ? 700 : 400, whiteSpace: 'nowrap', textAlign: 'center' }}>
                       {entry.salary}
                     </td>
-                    <td>
-                      <textarea
-                        className="input"
-                        style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 52, resize: 'vertical' }}
-                        value={expectations[entry.key] ?? ''}
-                        onChange={e => update(entry.key, e.target.value)}
-                        placeholder={`${entry.key} Gradeに求める目安・行動基準`}
-                      />
-                    </td>
+                    {showTextarea && (
+                      <td rowSpan={2}>
+                        <textarea
+                          className="input"
+                          style={{ padding: '6px 10px', fontSize: '.8125rem', minHeight: 52, resize: 'vertical' }}
+                          value={expectations[eKey] ?? ''}
+                          onChange={e => update(eKey, e.target.value)}
+                          placeholder={`${eKey}に求める目安・行動基準`}
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
-              })
-            )}
+              });
+            })}
           </tbody>
         </table>
       </div>

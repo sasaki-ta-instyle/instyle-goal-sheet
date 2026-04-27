@@ -5,7 +5,7 @@ const STEPS = [
   { num: 2, label: '会社目標' },
   { num: 3, label: '部署目標' },
   { num: 4, label: '個人目標' },
-  { num: 5, label: 'Grade' },
+  { num: 5, label: 'グレード' },
   { num: 6, label: '昇格評価' },
   { num: 7, label: 'ボーナス' },
   { num: 8, label: '確認・出力' },
@@ -18,7 +18,7 @@ interface Props {
 
 export default function StepIndicator({ current, onNavigate }: Props) {
   return (
-    <div style={{
+    <div className="step-nav" style={{
       display: 'flex',
       justifyContent: 'center',
       padding: '0 24px',
