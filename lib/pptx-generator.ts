@@ -155,28 +155,29 @@ function slide2(prs: InstanceType<typeof pptxgen>, d: FormData) {
 
   const NUM_COLS = ['前期実績（円）\n2025.10〜2026.3', '今期目標（円）\n2026.4〜9', '今期実績（円）\n2026.4〜9', '成長率(%)', '来期目標'];
 
-  // ① 売上
-  addSectionLabel(sl, y, '① 売上');
+  // ① 戦略的フォーカス
+  addSectionLabel(sl, y, '① 戦略的フォーカス');
+  y += 0.3;
+  textBox(sl, 0.4, y, W - 0.8, 0.6, c.strategicFocus || '—');
+  y += 0.6 + 0.2;
+
+  // ② 売上
+  addSectionLabel(sl, y, '② 売上');
   y += 0.3;
   addTable(sl, y, ['指標', ...NUM_COLS], [
-    ['グループ売上合計', c.revenue.prev || '—', c.revenue.target || '—', c.revenue.actual || '—', calcGrowth(c.revenue.prev, c.revenue.actual), c.revenue.nextTarget || '—'],
+    ['会社売上合計', c.revenue.prev || '—', c.revenue.target || '—', c.revenue.actual || '—', calcGrowth(c.revenue.prev, c.revenue.actual), c.revenue.nextTarget || '—'],
   ], [2.2, 1.5, 1.5, 1.5, 1.0, 2.0]);
   y += 0.3 + 0.28;
 
-  // ② 利益
-  addSectionLabel(sl, y, '② 利益');
+  // ③ 利益
+  addSectionLabel(sl, y, '③ 利益');
   y += 0.3;
   addTable(sl, y, ['指標', ...NUM_COLS], [
-    ['グループ営業利益', c.operatingProfit.prev || '—', c.operatingProfit.target || '—', c.operatingProfit.actual || '—', calcGrowth(c.operatingProfit.prev, c.operatingProfit.actual), c.operatingProfit.nextTarget || '—'],
-    ['グループ営業利益率', c.operatingMargin.prev || '—', c.operatingMargin.target || '—', c.operatingMargin.actual || '—', calcGrowth(c.operatingMargin.prev, c.operatingMargin.actual), c.operatingMargin.nextTarget || '—'],
-    ['グループ粗利益', c.grossProfit.prev || '—', c.grossProfit.target || '—', c.grossProfit.actual || '—', calcGrowth(c.grossProfit.prev, c.grossProfit.actual), c.grossProfit.nextTarget || '—'],
+    ['会社営業利益', c.operatingProfit.prev || '—', c.operatingProfit.target || '—', c.operatingProfit.actual || '—', calcGrowth(c.operatingProfit.prev, c.operatingProfit.actual), c.operatingProfit.nextTarget || '—'],
+    ['会社営業利益率', c.operatingMargin.prev || '—', c.operatingMargin.target || '—', c.operatingMargin.actual || '—', calcGrowth(c.operatingMargin.prev, c.operatingMargin.actual), c.operatingMargin.nextTarget || '—'],
+    ['会社粗利益', c.grossProfit.prev || '—', c.grossProfit.target || '—', c.grossProfit.actual || '—', calcGrowth(c.grossProfit.prev, c.grossProfit.actual), c.grossProfit.nextTarget || '—'],
   ], [2.2, 1.5, 1.5, 1.5, 1.0, 2.0]);
   y += 0.3 + 0.28 * 3;
-
-  // ③ 来期テーマ（戦略的フォーカス）
-  addSectionLabel(sl, y, '③ 来期テーマ（戦略的フォーカス）');
-  y += 0.3;
-  textBox(sl, 0.4, y, W - 0.8, 0.6, c.strategicFocus || '—');
 }
 
 // スライド3: 部署目標

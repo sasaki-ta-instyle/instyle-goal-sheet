@@ -106,34 +106,34 @@ export default function CompanyGoalForm({ data, onChange }: Props) {
     set(rowKey, { ...data[rowKey], [field]: value });
 
   const profitRows = [
-    { label: 'グループ営業利益', rowKey: 'operatingProfit' as const },
-    { label: 'グループ営業利益率', rowKey: 'operatingMargin' as const },
-    { label: 'グループ粗利益', rowKey: 'grossProfit' as const },
+    { label: '会社営業利益', rowKey: 'operatingProfit' as const },
+    { label: '会社営業利益率', rowKey: 'operatingMargin' as const },
+    { label: '会社粗利益', rowKey: 'grossProfit' as const },
   ];
 
   return (
     <div>
       <p className="section-title">01｜会社目標 記入シート</p>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 売上</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>① 戦略的フォーカス</p>
+      <textarea
+        className="input"
+        style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem', marginBottom: 24 }}
+        placeholder="今期の戦略的フォーカスを記入"
+        value={data.strategicFocus}
+        onChange={e => set('strategicFocus', e.target.value)}
+      />
+
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>② 売上</p>
       <KpiNumTable
-        rows={[{ label: 'グループ売上合計', data: data.revenue }]}
+        rows={[{ label: '会社売上合計', data: data.revenue }]}
         onUpdate={(_i, field, value) => updateRevenue(field, value)}
       />
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>② 利益</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 利益</p>
       <KpiNumTable
         rows={profitRows.map(r => ({ label: r.label, data: data[r.rowKey] }))}
         onUpdate={(i, field, value) => updateProfitRow(profitRows[i].rowKey, field, value)}
-      />
-
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 来期テーマ（戦略的フォーカス）</p>
-      <textarea
-        className="input"
-        style={{ width: '100%', minHeight: 80, resize: 'vertical', padding: '6px 8px', fontSize: '.8125rem' }}
-        placeholder="来期の戦略的フォーカスを記入"
-        value={data.strategicFocus}
-        onChange={e => set('strategicFocus', e.target.value)}
       />
     </div>
   );
