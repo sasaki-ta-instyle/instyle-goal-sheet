@@ -16,10 +16,34 @@ const notoSansJP = Noto_Sans_JP({
   display: 'swap',
 });
 
+const SITE_URL = "https://app.instyle.group/instyle-goal-sheet";
+const ASSETS = "https://app.instyle.group/_shared/static";
+const TITLE = "目標設定シート | INSTYLE GROUP";
+const DESCRIPTION = "INSTYLE GROUP 目標設定フォーム — 入力内容をPPTXで書き出します";
+
 export const metadata: Metadata = {
-  title: "目標設定シート | INSTYLE GROUP",
-  description: "INSTYLE GROUP 目標設定フォーム — 入力内容をPPTXで書き出します",
-  icons: { icon: '/favicon.png' },
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  icons: {
+    icon: `${ASSETS}/favicon.png`,
+    apple: `${ASSETS}/favicon.png`,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "INSTYLE GROUP",
+    locale: "ja_JP",
+    url: SITE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: `${ASSETS}/ogp.jpg`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [`${ASSETS}/ogp.jpg`],
+  },
 };
 
 export default function RootLayout({
