@@ -191,7 +191,7 @@ export function createDefaultFormData(): FormData {
     personal: {
       currentStatus: [
         { label: '前回面談で指摘された課題', value: '' },
-        { label: 'それを受けてこの半期どう行動したか', value: '' },
+        { label: 'それを受けてどう行動したか', value: '' },
         { label: '今期の役割・期待（自己認識）', value: '' },
       ],
       smartGoals: Array(3).fill(null).map(() => ({ goal: '', targetValue: '', deadline: '', note: '' })),

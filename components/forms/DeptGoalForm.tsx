@@ -145,7 +145,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
         </table>
       </div>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 来期の重点施策（KPIを達成するための行動）</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 今期の重点施策（KPIを達成するための行動）</p>
       <div className="table-wrap">
         <table className="data-table">
           <thead>

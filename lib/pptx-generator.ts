@@ -212,8 +212,8 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
     [2.8, 1.4, 1.4, 1.4, 1.0, 1.8]);
   y += 0.3 + 0.28 * 3;
 
-  // ③ 来期の重点施策
-  addSectionLabel(sl, y, '③ 来期の重点施策（KPIを達成するための行動）');
+  // ③ 今期の重点施策
+  addSectionLabel(sl, y, '③ 今期の重点施策（KPIを達成するための行動）');
   y += 0.3;
   const actionRows = c.actions.map((r, i) => [
     `${i + 1}`, r.content || '—', r.expectedEffect || '—', r.deadline || '—',
