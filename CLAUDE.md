@@ -58,9 +58,13 @@ pm2 reload app-instyle-goal-sheet --update-env
 - ConoHa 側:
   - `/var/www/app/instyle-goal-sheet/{releases,shared}` 作成（オーナー deploy）
   - `/var/www/_shared/apps/app-instyle-goal-sheet.env` 配置（必要なら）
-  - Nginx の `app.instyle.group` server ブロックに以下を追加:
+  - `/etc/nginx/conf.d/proxy-apps/app/instyle-goal-sheet.conf` に以下を作成（exact + `^~` prefix の 2 段で trailing-slash ループ回避）:
     ```nginx
-    location /instyle-goal-sheet/ {
+    location = /instyle-goal-sheet {
+      include snippets/proxy-next.conf;
+      proxy_pass http://127.0.0.1:3001;
+    }
+    location ^~ /instyle-goal-sheet/ {
       include snippets/proxy-next.conf;
       proxy_pass http://127.0.0.1:3001;
     }
