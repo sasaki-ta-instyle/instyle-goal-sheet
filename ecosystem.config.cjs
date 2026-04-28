@@ -1,8 +1,10 @@
 // PM2 config for ConoHa production
-// app.instyle.group/instyle-goal-sheet/ → 127.0.0.1:3001
+// Always reads server.js / .env.* via the `current` symlink so that
+// `pm2 reload ecosystem.config.cjs` picks up the latest release.
 
 const fs = require("fs");
-const path = require("path");
+
+const SERVER_DIR = "/var/www/app/instyle-goal-sheet/current";
 
 function loadEnvFile(p) {
   if (!fs.existsSync(p)) return {};
@@ -14,15 +16,15 @@ function loadEnvFile(p) {
   return out;
 }
 
-const envBase = loadEnvFile(path.resolve(__dirname, ".env.base"));
-const envApp = loadEnvFile(path.resolve(__dirname, ".env.app"));
+const envBase = loadEnvFile(SERVER_DIR + "/.env.base");
+const envApp = loadEnvFile(SERVER_DIR + "/.env.app");
 
 module.exports = {
   apps: [
     {
       name: "app-instyle-goal-sheet",
-      script: "server.js",
-      cwd: __dirname,
+      script: SERVER_DIR + "/server.js",
+      cwd: SERVER_DIR,
       instances: 1,
       exec_mode: "fork",
       autorestart: true,
