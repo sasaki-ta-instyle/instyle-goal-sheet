@@ -77,7 +77,6 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
         <table className="data-table">
           <thead>
             <tr>
-              <th>#</th>
               <th>具体的目標（Specific）</th>
               <th style={{ width: 110 }}>目標値</th>
               <th style={{ width: 110 }}>期限</th>
@@ -87,7 +86,6 @@ export default function PersonalGoalForm({ data, onChange }: Props) {
           <tbody>
             {data.smartGoals.map((row, i) => (
               <tr key={i}>
-                <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>目標{i + 1}</td>
                 <td><TI value={row.goal} onChange={v => updateSmart(i, 'goal', v)} placeholder="具体的な目標" /></td>
                 <td><TI value={row.targetValue} onChange={v => updateSmart(i, 'targetValue', v)} placeholder="数値" /></td>
                 <td><TI value={row.deadline} onChange={v => updateSmart(i, 'deadline', v)} placeholder="〇月末" /></td>

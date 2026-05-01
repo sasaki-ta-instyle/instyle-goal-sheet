@@ -255,11 +255,11 @@ function slide4(prs: InstanceType<typeof pptxgen>, d: FormData) {
   // ② SMART個人目標
   addSectionLabel(sl, y, '② SMART個人目標');
   y += 0.3;
-  const smartRows = c.smartGoals.map((r, i) => [
-    `目標${i + 1}`, r.goal || '—', r.targetValue || '—', r.deadline || '—', r.note || '—',
+  const smartRows = c.smartGoals.map((r) => [
+    r.goal || '—', r.targetValue || '—', r.deadline || '—', r.note || '—',
   ]);
-  addTable(sl, y, ['#', '目標（Specific）', '目標値', '期限', '備考・関連目標'], smartRows,
-    [0.8, 4.5, 1.5, 1.3, 2.5]);
+  addTable(sl, y, ['目標（Specific）', '目標値', '期限', '備考・関連目標'], smartRows,
+    [5.3, 1.5, 1.3, 2.5]);
   y += 0.3 + smartRows.length * 0.3;
 
   // ③ 部署KPIへの貢献

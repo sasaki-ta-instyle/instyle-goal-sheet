@@ -38,9 +38,9 @@ function TI({ value, onChange, placeholder, numeric }: { value: string; onChange
 }
 
 const KPI_COLS: { key: keyof DeptKpiNumRow; label: string; sub: string; numeric?: boolean }[] = [
-  { key: 'prev', label: '前期実績（円）', sub: '2025.10〜2026.3', numeric: true },
-  { key: 'target', label: '今期目標（円）', sub: '2026.4〜9', numeric: true },
-  { key: 'actual', label: '今期実績（円）', sub: '2026.4〜9', numeric: true },
+  { key: 'prev', label: '前期実績', sub: '2025.10〜2026.3' },
+  { key: 'target', label: '今期目標', sub: '2026.4〜9' },
+  { key: 'actual', label: '今期実績', sub: '2026.4〜9' },
 ];
 
 export default function DeptGoalForm({ data, onChange }: Props) {
@@ -143,7 +143,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
           <thead>
             <tr>
               <th>KPI</th>
-              <th>指標名</th>
+              <th>指標名（単位）</th>
               {KPI_COLS.map(c => (
                 <th key={c.key}>
                   {c.label}
@@ -162,7 +162,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                   <TI
                     value={data[item.key].label}
                     onChange={v => updateKpi(item.key, 'label', v)}
-                    placeholder="指標名を入力"
+                    placeholder="指標名（単位）を入力"
                   />
                 </td>
                 {KPI_COLS.map(c => (
