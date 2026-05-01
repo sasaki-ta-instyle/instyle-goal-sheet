@@ -19,7 +19,19 @@ export default function Home() {
     if (typeof window === 'undefined') return createDefaultFormData();
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved) as FormData;
+      if (saved) {
+        const parsed = JSON.parse(saved) as FormData;
+        const def = createDefaultFormData();
+        return {
+          ...parsed,
+          dept: {
+            ...def.dept,
+            ...parsed.dept,
+            kgi1: { ...def.dept.kgi1, ...(parsed.dept?.kgi1 ?? {}) },
+            kgi2: { ...def.dept.kgi2, ...(parsed.dept?.kgi2 ?? {}) },
+          },
+        };
+      }
     } catch {}
     return createDefaultFormData();
   });

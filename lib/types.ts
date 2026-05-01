@@ -36,12 +36,21 @@ export interface DeptKpiNumRow {
   nextTarget: string;
 }
 
+export interface DeptKgiRow {
+  mission: string;
+  kgi: string;
+}
+
 export interface DeptGoalData {
   strategicFocusRef: string;
   mission: string;
+  kgi1: DeptKgiRow;
+  kgi2: DeptKgiRow;
   kpi1: DeptKpiNumRow;
   kpi2: DeptKpiNumRow;
   kpi3: DeptKpiNumRow;
+  kpi4: DeptKpiNumRow;
+  kpi5: DeptKpiNumRow;
   actions: DeptActionRow[];
 }
 
@@ -169,6 +178,7 @@ export const GRADE_OPTIONS: { value: Grade; label: string }[] = GRADE_TABLE.flat
 
 const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '', nextTarget: '' });
 const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', nextTarget: '' });
+const emptyDeptKgi = (): DeptKgiRow => ({ mission: '', kgi: '' });
 
 export function createDefaultFormData(): FormData {
   return {
@@ -183,9 +193,13 @@ export function createDefaultFormData(): FormData {
     dept: {
       strategicFocusRef: '',
       mission: '',
+      kgi1: emptyDeptKgi(),
+      kgi2: emptyDeptKgi(),
       kpi1: emptyDeptKpiNum(),
       kpi2: emptyDeptKpiNum(),
       kpi3: emptyDeptKpiNum(),
+      kpi4: emptyDeptKpiNum(),
+      kpi5: emptyDeptKpiNum(),
       actions: Array(4).fill(null).map(() => ({ content: '', expectedEffect: '', deadline: '' })),
     },
     personal: {

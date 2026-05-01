@@ -1,5 +1,5 @@
 'use client';
-import { DeptGoalData, DeptKpiNumRow, DeptActionRow } from '@/lib/types';
+import { DeptGoalData, DeptKpiNumRow, DeptKgiRow, DeptActionRow } from '@/lib/types';
 
 interface Props {
   data: DeptGoalData;
@@ -47,18 +47,28 @@ export default function DeptGoalForm({ data, onChange }: Props) {
   const set = <K extends keyof DeptGoalData>(key: K, value: DeptGoalData[K]) =>
     onChange({ ...data, [key]: value });
 
-  const updateKpi = (kpiKey: 'kpi1' | 'kpi2' | 'kpi3', field: keyof DeptKpiNumRow, value: string) =>
+  const updateKpi = (kpiKey: 'kpi1' | 'kpi2' | 'kpi3' | 'kpi4' | 'kpi5', field: keyof DeptKpiNumRow, value: string) =>
     set(kpiKey, { ...data[kpiKey], [field]: value });
+
+  const updateKgi = (kgiKey: 'kgi1' | 'kgi2', field: keyof DeptKgiRow, value: string) =>
+    set(kgiKey, { ...data[kgiKey], [field]: value });
 
   const updateAction = (i: number, field: keyof DeptActionRow, value: string) => {
     const arr = data.actions.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
     set('actions', arr);
   };
 
+  const kgiItems = [
+    { key: 'kgi1' as const, label: '主要KGI①' },
+    { key: 'kgi2' as const, label: '主要KGI②' },
+  ];
+
   const kpiItems = [
     { key: 'kpi1' as const, label: '主要KPI①' },
     { key: 'kpi2' as const, label: '主要KPI②' },
     { key: 'kpi3' as const, label: '主要KPI③' },
+    { key: 'kpi4' as const, label: '主要KPI④' },
+    { key: 'kpi5' as const, label: '主要KPI⑤' },
   ];
 
   return (
@@ -89,7 +99,45 @@ export default function DeptGoalForm({ data, onChange }: Props) {
         </div>
       </div>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>② 部署KPI目標</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>② 部署KGI目標</p>
+      <div className="table-wrap" style={{ marginBottom: 24 }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th style={{ width: 120 }}>区分</th>
+              <th>ミッション</th>
+              <th>KGI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {kgiItems.map(item => (
+              <tr key={item.key}>
+                <td style={{ color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{item.label}</td>
+                <td>
+                  <textarea
+                    className="input"
+                    style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
+                    value={data[item.key].mission}
+                    onChange={e => updateKgi(item.key, 'mission', e.target.value)}
+                    placeholder="ミッションを記入"
+                  />
+                </td>
+                <td>
+                  <textarea
+                    className="input"
+                    style={{ padding: '6px 8px', fontSize: '.8125rem', minHeight: 72, resize: 'vertical' }}
+                    value={data[item.key].kgi}
+                    onChange={e => updateKgi(item.key, 'kgi', e.target.value)}
+                    placeholder="KGIを記入"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 部署KPI目標</p>
       <div className="table-wrap" style={{ marginBottom: 24 }}>
         <table className="data-table">
           <thead>
@@ -145,7 +193,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
         </table>
       </div>
 
-      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 今期の重点施策（KPIを達成するための行動）</p>
+      <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>④ 今期の重点施策（KPIを達成するための行動）</p>
       <div className="table-wrap">
         <table className="data-table">
           <thead>

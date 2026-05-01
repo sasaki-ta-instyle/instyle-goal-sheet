@@ -198,22 +198,36 @@ function slide3(prs: InstanceType<typeof pptxgen>, d: FormData) {
   textBox(sl, 0.4 + halfW + 0.16, y, halfW, 0.55, '部署のミッション：\n' + (c.mission || '—'));
   y += 0.65;
 
-  // ② 部署KPI目標
-  addSectionLabel(sl, y, '② 部署KPI目標');
+  // ② 部署KGI目標
+  addSectionLabel(sl, y, '② 部署KGI目標');
+  y += 0.3;
+  const kgiData = [
+    { label: '主要KGI①', r: c.kgi1 },
+    { label: '主要KGI②', r: c.kgi2 },
+  ];
+  addTable(sl, y, ['区分', 'ミッション', 'KGI'],
+    kgiData.map(k => [k.label, k.r.mission || '—', k.r.kgi || '—']),
+    [1.6, 5.4, 5.4]);
+  y += 0.3 + 0.28 * 2;
+
+  // ③ 部署KPI目標
+  addSectionLabel(sl, y, '③ 部署KPI目標');
   y += 0.3;
   const KPI_COLS = ['前期実績\n2025.10〜2026.3', '今期目標\n2026.4〜9', '今期実績\n2026.4〜9', '成長率(%)', '来期目標'];
   const kpiData = [
     { label: `主要KPI①（${c.kpi1.label || '　　　'}）`, r: c.kpi1 },
     { label: `主要KPI②（${c.kpi2.label || '　　　'}）`, r: c.kpi2 },
     { label: `主要KPI③（${c.kpi3.label || '　　　'}）`, r: c.kpi3 },
+    { label: `主要KPI④（${c.kpi4.label || '　　　'}）`, r: c.kpi4 },
+    { label: `主要KPI⑤（${c.kpi5.label || '　　　'}）`, r: c.kpi5 },
   ];
   addTable(sl, y, ['KPI', ...KPI_COLS],
     kpiData.map(k => [k.label, k.r.prev || '—', k.r.target || '—', k.r.actual || '—', calcGrowth(k.r.prev, k.r.actual), k.r.nextTarget || '—']),
     [2.8, 1.4, 1.4, 1.4, 1.0, 1.8]);
-  y += 0.3 + 0.28 * 3;
+  y += 0.3 + 0.28 * 5;
 
-  // ③ 今期の重点施策
-  addSectionLabel(sl, y, '③ 今期の重点施策（KPIを達成するための行動）');
+  // ④ 今期の重点施策
+  addSectionLabel(sl, y, '④ 今期の重点施策（KPIを達成するための行動）');
   y += 0.3;
   const actionRows = c.actions.map((r, i) => [
     `${i + 1}`, r.content || '—', r.expectedEffect || '—', r.deadline || '—',
