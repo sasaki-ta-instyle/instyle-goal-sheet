@@ -24,11 +24,11 @@ function calcGrowth(prev: string, actual: string): string {
   return `${val > 0 ? '+' : ''}${val}%`;
 }
 
-function TI({ value, onChange, placeholder, autoNumber }: { value: string; onChange: (v: string) => void; placeholder?: string; autoNumber?: boolean }) {
+function TI({ value, onChange, placeholder, autoNumber, compact }: { value: string; onChange: (v: string) => void; placeholder?: string; autoNumber?: boolean; compact?: boolean }) {
   return (
     <input
       className="input"
-      style={{ padding: '6px 8px', fontSize: '.8125rem' }}
+      style={{ padding: '6px 8px', fontSize: compact ? '.75rem' : '.8125rem' }}
       value={value}
       onChange={e => onChange(autoNumber ? autoComma(e.target.value) : e.target.value)}
       placeholder={placeholder ?? '—'}
@@ -169,8 +169,9 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                     <TI
                       value={data[item.key][c.key]}
                       onChange={v => updateKpi(item.key, c.key, v)}
-                      placeholder="自由記入"
+                      placeholder="数字または自由記入"
                       autoNumber={c.autoNumber}
+                      compact
                     />
                   </td>
                 ))}
