@@ -6,14 +6,14 @@ interface Props {
   onChange: (data: DeptGoalData) => void;
 }
 
-const toNumeric = (v: string) => {
-  const raw = v
-    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-    .replace(/[^0-9.]/g, '');
-  if (!raw) return '';
-  const parts = raw.split('.');
-  parts[0] = parts[0] ? Number(parts[0]).toLocaleString('ja-JP') : '';
-  return parts.length > 1 ? `${parts[0]}.${parts[1]}` : parts[0];
+const autoComma = (v: string) => {
+  const normalized = v.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  const stripped = normalized.replace(/,/g, '');
+  if (stripped === '') return '';
+  if (!/^-?\d+(\.\d*)?$/.test(stripped)) return v;
+  const parts = stripped.split('.');
+  parts[0] = Number(parts[0]).toLocaleString('ja-JP');
+  return parts.join('.');
 };
 
 function calcGrowth(prev: string, actual: string): string {
@@ -24,23 +24,22 @@ function calcGrowth(prev: string, actual: string): string {
   return `${val > 0 ? '+' : ''}${val}%`;
 }
 
-function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
+function TI({ value, onChange, placeholder, autoNumber }: { value: string; onChange: (v: string) => void; placeholder?: string; autoNumber?: boolean }) {
   return (
     <input
       className="input"
       style={{ padding: '6px 8px', fontSize: '.8125rem' }}
       value={value}
-      inputMode={numeric ? 'decimal' : undefined}
-      onChange={e => onChange(numeric ? toNumeric(e.target.value) : e.target.value)}
+      onChange={e => onChange(autoNumber ? autoComma(e.target.value) : e.target.value)}
       placeholder={placeholder ?? '—'}
     />
   );
 }
 
-const KPI_COLS: { key: keyof DeptKpiNumRow; label: string; sub: string; numeric?: boolean }[] = [
-  { key: 'prev', label: '前期実績', sub: '2025.10〜2026.3' },
-  { key: 'target', label: '今期目標', sub: '2026.4〜9' },
-  { key: 'actual', label: '今期実績', sub: '2026.4〜9' },
+const KPI_COLS: { key: keyof DeptKpiNumRow; label: string; sub: string; autoNumber?: boolean }[] = [
+  { key: 'prev', label: '前期実績', sub: '2025.10〜2026.3', autoNumber: true },
+  { key: 'target', label: '今期目標', sub: '2026.4〜9', autoNumber: true },
+  { key: 'actual', label: '今期実績', sub: '2026.4〜9', autoNumber: true },
 ];
 
 export default function DeptGoalForm({ data, onChange }: Props) {
@@ -162,7 +161,7 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                   <TI
                     value={data[item.key].label}
                     onChange={v => updateKpi(item.key, 'label', v)}
-                    placeholder="指標名（単位）を入力"
+                    placeholder="指標名"
                   />
                 </td>
                 {KPI_COLS.map(c => (
@@ -170,8 +169,8 @@ export default function DeptGoalForm({ data, onChange }: Props) {
                     <TI
                       value={data[item.key][c.key]}
                       onChange={v => updateKpi(item.key, c.key, v)}
-                      placeholder={c.numeric ? '0' : '自由記入'}
-                      numeric={c.numeric}
+                      placeholder="自由記入"
+                      autoNumber={c.autoNumber}
                     />
                   </td>
                 ))}
