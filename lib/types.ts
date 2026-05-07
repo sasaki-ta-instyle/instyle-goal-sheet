@@ -180,9 +180,11 @@ const emptyKpiNum = (): KpiNumRow => ({ prev: '', target: '', actual: '', nextTa
 const emptyDeptKpiNum = (): DeptKpiNumRow => ({ label: '', prev: '', target: '', actual: '', nextTarget: '' });
 const emptyDeptKgi = (): DeptKgiRow => ({ mission: '', kgi: '' });
 
+export const CURRENT_PERIOD = '2026.4〜9';
+
 export function createDefaultFormData(): FormData {
   return {
-    cover: { company: '', name: '', grade: '', period: '2026.4〜9' },
+    cover: { company: '', name: '', grade: '', period: CURRENT_PERIOD },
     company: {
       revenue: emptyKpiNum(),
       operatingProfit: emptyKpiNum(),

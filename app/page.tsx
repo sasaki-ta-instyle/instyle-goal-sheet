@@ -9,7 +9,7 @@ import PersonalGoalForm from '@/components/forms/PersonalGoalForm';
 import GradeForm from '@/components/forms/GradeForm';
 import PromotionForm from '@/components/forms/PromotionForm';
 import BonusForm from '@/components/forms/BonusForm';
-import { createDefaultFormData, FormData } from '@/lib/types';
+import { createDefaultFormData, CURRENT_PERIOD, FormData } from '@/lib/types';
 
 const STORAGE_KEY = 'instyle-goal-sheet-v1';
 
@@ -24,6 +24,7 @@ export default function Home() {
         const def = createDefaultFormData();
         return {
           ...parsed,
+          cover: { ...def.cover, ...parsed.cover, period: CURRENT_PERIOD },
           dept: {
             ...def.dept,
             ...parsed.dept,

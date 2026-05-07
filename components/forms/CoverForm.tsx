@@ -1,5 +1,5 @@
 'use client';
-import { CoverData, GRADE_OPTIONS } from '@/lib/types';
+import { CoverData, CURRENT_PERIOD, GRADE_OPTIONS } from '@/lib/types';
 
 interface Props {
   data: CoverData;
@@ -56,7 +56,7 @@ export default function CoverForm({ data, onChange }: Props) {
         <div>
           <label className="form-label">期</label>
           <div className="input" style={{ color: 'var(--color-text-muted)', userSelect: 'none' }}>
-            2026.4〜9
+            {CURRENT_PERIOD}
           </div>
         </div>
       </div>
