@@ -7,13 +7,16 @@ interface Props {
 }
 
 const toNumeric = (v: string) => {
-  const raw = v
+  const normalized = v
     .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-    .replace(/[^0-9.]/g, '');
-  if (!raw) return '';
+    .replace(/[ー−–—－]/g, '-');
+  const sign = normalized.trimStart().startsWith('-') ? '-' : '';
+  const raw = normalized.replace(/[^0-9.]/g, '');
+  if (!raw) return sign;
   const parts = raw.split('.');
   parts[0] = parts[0] ? Number(parts[0]).toLocaleString('ja-JP') : '';
-  return parts.length > 1 ? `${parts[0]}.${parts[1]}` : parts[0];
+  const body = parts.length > 1 ? `${parts[0]}.${parts[1]}` : parts[0];
+  return sign + body;
 };
 
 function calcGrowth(prev: string, actual: string): string {
@@ -24,18 +27,35 @@ function calcGrowth(prev: string, actual: string): string {
   return `${val > 0 ? '+' : ''}${val}%`;
 }
 
-function TI({ value, onChange, placeholder, numeric }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean }) {
+function TI({ value, onChange, placeholder, numeric, readOnly }: { value: string; onChange: (v: string) => void; placeholder?: string; numeric?: boolean; readOnly?: boolean }) {
   return (
     <input
       className="input"
-      style={{ padding: '6px 8px', fontSize: '.8125rem' }}
+      style={{
+        padding: '6px 8px',
+        fontSize: '.8125rem',
+        ...(readOnly ? { background: 'var(--glass-tinted)', color: 'var(--color-text-muted)', cursor: 'default' } : {}),
+      }}
       value={value}
       inputMode={numeric ? 'decimal' : undefined}
-      onChange={e => onChange(numeric ? toNumeric(e.target.value) : e.target.value)}
+      readOnly={readOnly}
+      tabIndex={readOnly ? -1 : undefined}
+      onChange={e => {
+        if (readOnly) return;
+        onChange(numeric ? toNumeric(e.target.value) : e.target.value);
+      }}
       placeholder={placeholder ?? '—'}
     />
   );
 }
+
+const computeMargin = (profit: string, revenue: string): string => {
+  if (!profit || !revenue) return '';
+  const p = parseFloat(profit.replace(/,/g, ''));
+  const r = parseFloat(revenue.replace(/,/g, ''));
+  if (isNaN(p) || isNaN(r) || r === 0) return '';
+  return `${(p / r * 100).toFixed(1)}%`;
+};
 
 const NUM_COLS: { key: keyof KpiNumRow; label: string; sub: string; numeric?: boolean }[] = [
   { key: 'prev', label: '前期実績（円）', sub: '2025.10〜2026.3', numeric: true },
@@ -47,7 +67,7 @@ function KpiNumTable({
   rows,
   onUpdate,
 }: {
-  rows: { label: string; data: KpiNumRow }[];
+  rows: { label: string; data: KpiNumRow; readOnlyNumeric?: boolean }[];
   onUpdate: (rowIdx: number, field: keyof KpiNumRow, value: string) => void;
 }) {
   return (
@@ -72,7 +92,13 @@ function KpiNumTable({
               <td style={{ fontWeight: 500, whiteSpace: 'nowrap', fontSize: '.8125rem' }}>{row.label}</td>
               {NUM_COLS.map(c => (
                 <td key={c.key}>
-                  <TI value={row.data[c.key]} onChange={v => onUpdate(i, c.key, v)} placeholder={c.numeric ? '0' : '自由記入'} numeric={c.numeric} />
+                  <TI
+                    value={row.data[c.key]}
+                    onChange={v => onUpdate(i, c.key, v)}
+                    placeholder={row.readOnlyNumeric ? '自動計算' : c.numeric ? '0' : '自由記入'}
+                    numeric={c.numeric}
+                    readOnly={row.readOnlyNumeric}
+                  />
                 </td>
               ))}
               <td style={{ textAlign: 'center', fontWeight: 600, fontSize: '.875rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
@@ -99,16 +125,40 @@ export default function CompanyGoalForm({ data, onChange }: Props) {
   const set = <K extends keyof CompanyGoalData>(key: K, value: CompanyGoalData[K]) =>
     onChange({ ...data, [key]: value });
 
-  const updateRevenue = (field: keyof KpiNumRow, value: string) =>
-    set('revenue', { ...data.revenue, [field]: value });
+  const isMarginNumericField = (field: keyof KpiNumRow): field is 'prev' | 'target' | 'actual' =>
+    field === 'prev' || field === 'target' || field === 'actual';
 
-  const updateProfitRow = (rowKey: 'operatingProfit' | 'operatingMargin' | 'grossProfit', field: keyof KpiNumRow, value: string) =>
+  const updateRevenue = (field: keyof KpiNumRow, value: string) => {
+    const newRevenue = { ...data.revenue, [field]: value };
+    if (isMarginNumericField(field)) {
+      const newMargin = {
+        ...data.operatingMargin,
+        [field]: computeMargin(data.operatingProfit[field], value),
+      };
+      onChange({ ...data, revenue: newRevenue, operatingMargin: newMargin });
+    } else {
+      set('revenue', newRevenue);
+    }
+  };
+
+  const updateProfitRow = (rowKey: 'operatingProfit' | 'operatingMargin' | 'grossProfit', field: keyof KpiNumRow, value: string) => {
+    if (rowKey === 'operatingMargin' && isMarginNumericField(field)) return;
+    if (rowKey === 'operatingProfit' && isMarginNumericField(field)) {
+      const newProfit = { ...data.operatingProfit, [field]: value };
+      const newMargin = {
+        ...data.operatingMargin,
+        [field]: computeMargin(value, data.revenue[field]),
+      };
+      onChange({ ...data, operatingProfit: newProfit, operatingMargin: newMargin });
+      return;
+    }
     set(rowKey, { ...data[rowKey], [field]: value });
+  };
 
   const profitRows = [
-    { label: '会社営業利益', rowKey: 'operatingProfit' as const },
-    { label: '会社営業利益率', rowKey: 'operatingMargin' as const },
-    { label: '会社粗利益', rowKey: 'grossProfit' as const },
+    { label: '会社営業利益', rowKey: 'operatingProfit' as const, readOnlyNumeric: false },
+    { label: '会社営業利益率', rowKey: 'operatingMargin' as const, readOnlyNumeric: true },
+    { label: '会社粗利益', rowKey: 'grossProfit' as const, readOnlyNumeric: false },
   ];
 
   return (
@@ -132,7 +182,7 @@ export default function CompanyGoalForm({ data, onChange }: Props) {
 
       <p style={{ fontSize: '.8125rem', fontWeight: 600, marginBottom: 12 }}>③ 利益</p>
       <KpiNumTable
-        rows={profitRows.map(r => ({ label: r.label, data: data[r.rowKey] }))}
+        rows={profitRows.map(r => ({ label: r.label, data: data[r.rowKey], readOnlyNumeric: r.readOnlyNumeric }))}
         onUpdate={(i, field, value) => updateProfitRow(profitRows[i].rowKey, field, value)}
       />
     </div>

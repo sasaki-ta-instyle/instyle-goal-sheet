@@ -15,6 +15,13 @@ const C = {
 
 const FONT = '游ゴシック';
 
+const ROW_BORDER: [pptxgen.BorderProps, pptxgen.BorderProps, pptxgen.BorderProps, pptxgen.BorderProps] = [
+  { pt: 0, color: 'FFFFFF' },
+  { pt: 0, color: 'FFFFFF' },
+  { pt: 0.5, color: C.light },
+  { pt: 0, color: 'FFFFFF' },
+];
+
 function calcGrowth(prev: string, actual: string): string {
   const p = parseFloat((prev || '').replace(/,/g, ''));
   const a = parseFloat((actual || '').replace(/,/g, ''));
@@ -54,6 +61,7 @@ function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[
       color: C.muted,
       fill: { color: C.header },
       align: 'left' as const,
+      border: ROW_BORDER,
     },
   })));
 
@@ -66,6 +74,7 @@ function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[
         color: C.text,
         fill: { color: fillColor },
         align: 'left' as const,
+        border: ROW_BORDER,
       },
     })));
   });
@@ -78,7 +87,6 @@ function addTable(sl: pptxgen.Slide, y: number, headers: string[], rows: string[
     w: W - 0.8,
     colW: actualWidths,
     rowH: 0.28,
-    border: { pt: 0, color: 'FFFFFF' },
     autoPage: false,
   });
 }
@@ -295,6 +303,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
         color: C.muted,
         fill: { color: C.header },
         align: 'left' as const,
+        border: ROW_BORDER,
       },
     })),
   ];
@@ -317,6 +326,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             fill: { color: 'E0DDD4' },
             align: 'center' as const,
             rowspan: grades.length,
+            border: ROW_BORDER,
           },
         });
         row.push({
@@ -326,6 +336,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             fill: { color: C.surface },
             align: 'left' as const,
             rowspan: grades.length,
+            border: ROW_BORDER,
           },
         });
       }
@@ -338,6 +349,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             color: C.text,
             fill: { color: fillColor },
             align: 'left' as const,
+            border: ROW_BORDER,
           },
         },
         {
@@ -347,6 +359,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             color: C.text,
             fill: { color: fillColor },
             align: 'right' as const,
+            border: ROW_BORDER,
           },
         },
       );
@@ -361,6 +374,7 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
             fill: { color: C.surface },
             align: 'left' as const,
             rowspan: span,
+            border: ROW_BORDER,
           },
         });
       }
@@ -374,7 +388,6 @@ function slide5(prs: InstanceType<typeof pptxgen>, selectedGrade: string, expect
     w: W - x0 * 2,
     colW: colWidths,
     rowH,
-    border: { pt: 0, color: 'FFFFFF' },
     autoPage: false,
   });
 
@@ -423,7 +436,7 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
   const tableData: pptxgen.TableRow[] = [
     ['#', '評価項目', '配点', '採点'].map(h => ({
       text: h,
-      options: { bold: true, fontSize: 7, fontFace: FONT, color: C.muted, fill: { color: C.header }, align: 'left' as const },
+      options: { bold: true, fontSize: 7, fontFace: FONT, color: C.muted, fill: { color: C.header }, align: 'left' as const, border: ROW_BORDER },
     })),
     ...evalRows.map((row, ri) => {
       const fillColor = ri % 2 === 0 ? C.surface : C.surface2;
@@ -433,6 +446,7 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
           fontSize: 9, fontFace: FONT, color: C.text, fill: { color: fillColor },
           align: (ci === 3 ? 'right' : 'left') as 'left' | 'right',
           bold: ci === 3,
+          border: ROW_BORDER,
         },
       }));
     }),
@@ -445,7 +459,6 @@ function slide6(prs: InstanceType<typeof pptxgen>, d: FormData) {
     w: W - 0.8,
     colW: colW.map(w => (w / totalW) * (W - 0.8)),
     rowH: 0.3,
-    border: { pt: 0, color: 'FFFFFF' },
     autoPage: false,
   });
 
